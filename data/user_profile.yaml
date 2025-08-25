@@ -1,0 +1,37 @@
+name: Tzvi Greenfeld
+title: Software Engineer
+contact:
+  email: tzvi@example.com
+  phone: "+972-50-123-4567"
+  linkedin: linkedin.com/in/tzvi
+
+summary: >
+  Software Engineer specializing in scalable cloud services and backend systems.
+
+employment_history:
+  - company: Microsoft
+    role: Software Engineer
+    start: 2022-05
+    end: Present
+    responsibilities:
+      - Built scalable APIs using ASP.NET and Azure
+      - Reduced service latency by 95% through caching strategies
+  - company: StartupX
+    role: Junior Developer
+    start: 2020-06
+    end: 2022-04
+    responsibilities:
+      - Developed CI/CD pipelines
+      - Implemented secure coding practices
+
+projects:
+  - name: FastAPI Service
+    description: Built a token refresh service with Spotify API.
+    technologies: [FastAPI, Python, Docker]
+
+skills:
+  - Python
+  - C#
+  - Azure
+  - FastAPI
+  - Docker
