@@ -1,0 +1,50 @@
+candidate:
+  name: Bobby Boy
+  title: Software Engineer
+
+summary: >
+  Software Engineer specializing in scalable cloud services and backend systems.
+
+contact:
+  - "+972-50-123-4567"
+  - bobby@example.com
+  - linkedin.com/in/bobby
+  - github.com/bobby  # Added github as required by the class
+
+experience:
+  - title: Software Engineer
+    dates: 05/2022 - Present
+    company: Microsoft
+    description: Building scalable APIs and cloud services
+    achievements:
+      - Built scalable APIs using ASP.NET and Azure
+      - Reduced service latency by 95% through caching strategies
+  - title: Junior Developer
+    dates: 06/2020 - 04/2022
+    company: StartupX
+    description: Full-stack development and DevOps
+    achievements:
+      - Developed CI/CD pipelines
+      - Implemented secure coding practices
+
+education:
+  - degree: Bachelor of Science in Computer Science
+    graduation_date: 05/2020
+    university: University of Technology
+    details:
+      - "GPA: 3.7/4.0"
+      - "Dean's List"
+
+skills:
+  - name: Programming Languages
+    skills:
+      - Python
+      - C#
+  - name: Cloud & Infrastructure
+    skills:
+      - Azure
+      - Docker
+  - name: Frameworks
+    skills:
+      - FastAPI
+      - ASP.NET
