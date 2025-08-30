@@ -1,3 +1,2 @@
 .venv
 *.pyc
-tools/__pycache__/cv_builder.cpython-313.pyc
