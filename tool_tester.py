@@ -6,9 +6,12 @@ Edit the TOOL_NAME and PARAMS below to run any tool directly.
 
 # --- Import your tools ---
 # from tools.job_reader import read_job_description
+import html
+import re
 from tools.user_profile import read_user_profile
 from tools.cv_builder import generate_cv_html
 from tools.pdf_exporter import html_file_to_pdf
+from utils.resume_parser import load_yaml_to_resume_data
 
 # --- Pick which tool to run ---
 PARAMS = {
@@ -40,5 +43,17 @@ def run_tool():
     print(f"\n✅ Result from {TOOL_NAME}:")
     print(result)
 
+def test_flow():
+    """_summary_
+        flow:
+        yaml to html
+        html to pdf
+    """
+    # data = read_user_profile(file_path="data/user_profile_resume_format.yaml") # remove this tool?
+    parsed_data = load_yaml_to_resume_data("data/user_profile_resume_format.yaml")
+    generate_cv_html(resume_data=parsed_data, output_path="templates/test.html")
+    html_file_to_pdf(html_file_path="templates/test.html", output_path="outputs/test.pdf")
+
+
 if __name__ == "__main__":
-    run_tool()
+    test_flow()
