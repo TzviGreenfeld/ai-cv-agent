@@ -105,42 +105,14 @@ Focus on making it ATS-friendly by naturally incorporating relevant keywords."""
             html_file_to_pdf(html_path, pdf_path)
             return f"PDF created at: {pdf_path}"
 
-        @tool # we never actually use this, need to figure out how to incorporate it
+        @tool
         def analyze_job_posting(job_url: str) -> str:
             """Analyze a job posting and extract key requirements, skills, and keywords"""
-            job_description = read_job_description(job_url)
-            
-            analysis_prompt = f"""Analyze this job posting and extract:
-1. Company name and role title
-2. Key requirements (must-haves)
-3. Nice-to-have skills
-4. Important keywords for ATS
-5. Company culture indicators
-6. Main responsibilities
-
-Job Description:
-{job_description}
-
-Format your response as a structured analysis."""
-
-            response = self.llm.invoke(analysis_prompt)
-            return response.content
-        
-        @tool
-        def create_complete_tailored_resume_with_analysis(job_url: str, output_name: str = "tailored_resume") -> str:
-            """Complete workflow with detailed analysis: read job, analyze changes, create tailored resume, and export all formats"""
-            import yaml
             import json
-            from datetime import datetime
             
-            # Create output directory if it doesn't exist
-            os.makedirs("outputs", exist_ok=True)
-            
-            # Step 1: Read and analyze job description
             job_description = read_job_description(job_url)
             
-            # Analyze the job posting
-            job_analysis_prompt = f"""Analyze this job posting and provide a structured analysis:
+            analysis_prompt = f"""Analyze this job posting and provide a structured analysis:
 
 Job Description:
 {job_description}
@@ -155,16 +127,41 @@ Provide your analysis in this exact JSON format:
     "keywords_for_ats": ["keyword1", "keyword2", ...],
     "main_responsibilities": ["resp1", "resp2", ...],
     "nice_to_have": ["nice1", "nice2", ...]
-}}"""
+}}
 
-            job_analysis_response = self.llm.invoke(job_analysis_prompt)
-            job_analysis = job_analysis_response.content
+Return ONLY the JSON object, no additional text or formatting."""
+
+            response = self.llm.invoke(analysis_prompt)
+            job_analysis = response.content
             
             # Clean JSON if wrapped in code blocks
             if "```json" in job_analysis:
                 job_analysis = job_analysis.split("```json")[1].split("```")[0].strip()
             elif "```" in job_analysis:
                 job_analysis = job_analysis.split("```")[1].split("```")[0].strip()
+            
+            # Validate it's proper JSON
+            try:
+                json.loads(job_analysis)
+            except json.JSONDecodeError:
+                # If not valid JSON, return as structured text
+                return response.content
+            
+            return job_analysis
+        
+        @tool
+        def create_complete_tailored_resume_with_analysis(job_url: str, output_name: str = "tailored_resume") -> str:
+            """Complete workflow with detailed analysis: read job, analyze changes, create tailored resume, and export all formats"""
+            import yaml
+            import json
+            from datetime import datetime
+            
+            # Create output directory if it doesn't exist
+            os.makedirs("outputs", exist_ok=True)
+            
+            # Step 1: Use the analyze_job_posting tool to get structured analysis
+            job_analysis = analyze_job_posting(job_url)
+            
             
             # Save job analysis
             analysis_path = f"outputs/{output_name}_job_analysis.json"
