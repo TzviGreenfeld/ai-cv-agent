@@ -63,52 +63,10 @@ class ResumeData:
             "skills": self.skills
         }
 
-def get_mock_data() -> ResumeData:
-    """Generate mock resume data"""
-    resume = ResumeData()
-    resume.candidate["name"] = "John Doe"
-    resume.candidate["title"] = "Software Engineer"
-    resume.summary = "Passionate software engineer with 5+ years of experience."
-    resume.set_contact_info(
-        phone="(123) 456-7890",
-        email="john.doe@example.com",
-        linkedin="linkedin.com/in/johndoe",
-        github="github.com/johndoe"
-    )
-    resume.add_job(
-        title="Senior Software Engineer",
-        dates="01/2020 – Present",
-        company="Tech Company",
-        description="Lead a team of developers to build scalable web applications.",
-        achievements=[
-            "Implemented a microservices architecture.",
-            "Reduced page load time by 30%."
-        ]
-    )
-    resume.add_education(
-        degree="Bachelor of Science in Computer Science",
-        graduation_date="05/2018",
-        university="University of Example",
-        details=["GPA: 3.8/4.0"]
-    )
-    resume.add_skill_category(
-        name="Programming Languages",
-        items=["Python", "JavaScript", "Java"]
-    )
-    resume.add_skill_category(
-        name="Frameworks",
-        items=["React", "Django", "Spring Boot"]
-    )
-    resume.add_skill_category(
-        name="Tools",
-        items=["Git", "Docker", "AWS"]
-    )
-    return resume
-
 def generate_cv_html(resume_data: Optional[ResumeData] = None, output_path: str = "templates/resume.html") -> str:
     """Generate HTML resume from template"""
     if resume_data is None:
-        resume_data = get_mock_data()
+        raise ValueError("resume_data must be provided")
 
     # Setup Jinja2 environment
     template_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates')
