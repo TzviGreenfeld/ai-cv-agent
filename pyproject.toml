@@ -10,4 +10,9 @@ dependencies = [
     "pyyaml>=6.0.2",
     "pydantic>=2.0.0",
     "trafilatura>=2.0.0",
+    "azure-ai-projects>=1.0.0",
+    "azure-identity>=1.24.0",
+    "dotenv>=0.9.9",
+    "langchain-openai>=0.3.32",
+    "langchain>=0.3.27",
 ]
