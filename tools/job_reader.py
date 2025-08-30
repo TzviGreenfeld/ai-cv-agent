@@ -3,8 +3,7 @@ from playwright.sync_api import sync_playwright
 import time
 
 def read_job_description(url: str) -> str:
-    # For MVP: just mock with static text instead of scraping
-    return "We are looking for a Python developer with Azure and FastAPI experience."
+    return read_url(url)
 
 def read_url(url: str) -> str:
     print(f"Fetching URL: {url}")
