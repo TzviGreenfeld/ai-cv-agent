@@ -18,6 +18,14 @@ from tools.pdf_exporter import html_file_to_pdf
 from tools.user_profile import read_user_profile
 from utils.resume_parser import load_yaml_to_resume_data
 
+# Import prompts
+from agent.prompts import (
+    SYSTEM_PROMPT,
+    TAILORING_PROMPT,
+    JOB_ANALYSIS_PROMPT,
+    DETAILED_TAILORING_PROMPT
+)
+
 # Load environment variables
 load_dotenv()
 
@@ -65,21 +73,10 @@ class LangChainCVAgent:
             user_profile = read_user_profile()
             
             # Use LLM to create tailored version
-            tailoring_prompt = f"""Based on this job description and user profile, create a tailored resume that:
-1. Emphasizes relevant skills and experiences
-2. Includes keywords from the job description (for ATS optimization)
-3. Reorders experience to highlight most relevant positions
-4. Adjusts the professional summary to match the role
-5. Focuses on achievements that align with job requirements
-
-Job Description:
-{job_description}
-
-User Profile:
-{yaml.dump(user_profile, default_flow_style=False)}
-
-Return a complete YAML resume in the same format as the user profile, optimized for this specific job.
-Focus on making it ATS-friendly by naturally incorporating relevant keywords."""
+            tailoring_prompt = TAILORING_PROMPT.format(
+                job_description=job_description,
+                user_profile=yaml.dump(user_profile, default_flow_style=False)
+            )
 
             response = self.llm.invoke(tailoring_prompt)
             tailored_yaml = response.content
@@ -112,24 +109,9 @@ Focus on making it ATS-friendly by naturally incorporating relevant keywords."""
             
             job_description = read_job_description(job_url)
             
-            analysis_prompt = f"""Analyze this job posting and provide a structured analysis:
-
-Job Description:
-{job_description}
-
-Provide your analysis in this exact JSON format:
-{{
-    "company": "Company Name",
-    "role": "Job Title",
-    "key_requirements": ["requirement1", "requirement2", ...],
-    "technical_skills": ["skill1", "skill2", ...],
-    "soft_skills": ["skill1", "skill2", ...],
-    "keywords_for_ats": ["keyword1", "keyword2", ...],
-    "main_responsibilities": ["resp1", "resp2", ...],
-    "nice_to_have": ["nice1", "nice2", ...]
-}}
-
-Return ONLY the JSON object, no additional text or formatting."""
+            analysis_prompt = JOB_ANALYSIS_PROMPT.format(
+                job_description=job_description
+            )
 
             response = self.llm.invoke(analysis_prompt)
             job_analysis = response.content
@@ -172,34 +154,10 @@ Return ONLY the JSON object, no additional text or formatting."""
             user_profile = read_user_profile()
             
             # Step 3: Create tailored resume with change tracking
-            tailoring_prompt = f"""Based on this job analysis and user profile, create a tailored resume.
-
-Job Analysis:
-{job_analysis}
-
-User Profile:
-{yaml.dump(user_profile, default_flow_style=False)}
-
-Create TWO outputs:
-
-1. A complete YAML resume in the exact same format as the user profile, optimized for this specific job
-2. A detailed list of changes you made and why
-
-For the YAML resume:
-- Emphasize relevant skills and experiences for THIS specific role
-- Include keywords from the job description naturally
-- Reorder experience to highlight most relevant positions first
-- Adjust the professional summary to directly address the job requirements
-- Focus on achievements that align with what the employer is looking for
-
-Format your response as:
-[RESUME_YAML]
-(your yaml content here)
-[/RESUME_YAML]
-
-[CHANGES_MADE]
-(your detailed explanation of changes here)
-[/CHANGES_MADE]"""
+            tailoring_prompt = DETAILED_TAILORING_PROMPT.format(
+                job_analysis=job_analysis,
+                user_profile=yaml.dump(user_profile, default_flow_style=False)
+            )
 
             response = self.llm.invoke(tailoring_prompt)
             full_response = response.content
@@ -250,20 +208,20 @@ Format your response as:
             
             # Create summary
             summary = f"""✅ Complete! Created:
-- Tailored YAML: {yaml_path}
-- HTML Resume: {html_path}
-- PDF Resume: {pdf_path}
-- Job Analysis: {analysis_path}
-- Changes Report: {changes_path}
+                    - Tailored YAML: {yaml_path}
+                    - HTML Resume: {html_path}
+                    - PDF Resume: {pdf_path}
+                    - Job Analysis: {analysis_path}
+                    - Changes Report: {changes_path}
 
-📋 JOB ANALYSIS SUMMARY:
-{job_analysis}
+                    📋 JOB ANALYSIS SUMMARY:
+                    {job_analysis}
 
-📝 KEY CHANGES MADE:
-{changes_made[:500]}...
+                    📝 KEY CHANGES MADE:
+                    {changes_made[:500]}...
 
-The resume has been optimized for the job posting with relevant keywords and tailored content.
-Check the changes report for full details."""
+                    The resume has been optimized for the job posting with relevant keywords and tailored content.
+                    Check the changes report for full details."""
             
             return summary
 
@@ -274,24 +232,7 @@ Check the changes report for full details."""
         """Create the LangChain agent"""
         # Enhanced prompt for CV tailoring
         prompt = ChatPromptTemplate.from_messages([
-            ("system", """You are an expert CV/Resume assistant specializing in creating ATS-optimized, tailored resumes. 
-
-Your capabilities include:
-1. Reading job descriptions from URLs
-2. Analyzing user profiles to understand their experience and skills
-3. Creating tailored resumes that match specific job requirements
-4. Optimizing for ATS (Applicant Tracking Systems) by incorporating relevant keywords
-5. Generating professional HTML and PDF outputs
-
-When asked to create a tailored resume:
-- Use the 'create_complete_tailored_resume_with_analysis' tool for a full workflow with detailed explanations
-- Use 'analyze_job_posting' to first understand the job requirements
-- Or use individual tools step-by-step for more control
-- Always focus on matching the job requirements while being truthful to the user's experience
-- Ensure keywords from the job description are naturally incorporated
-- Provide clear explanations of changes made to optimize the resume
-
-Be helpful, professional, and focused on creating the best possible resume for each specific opportunity."""),
+            ("system", SYSTEM_PROMPT),
             ("user", "{input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])
