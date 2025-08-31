@@ -44,20 +44,10 @@ def html_file_to_pdf(html_file_path: str, output_path: str = "outputs/cv.pdf", o
     html_to_pdf(html_content, output_path, options)
 
 
-# For more control over the PDF generation
-# pdf_options = {
-#     "format": "A4",
-#     "margin": {
-#         "top": "0.75in",
-#         "bottom": "0.75in", 
-#         "left": "0.75in",
-#         "right": "0.75in"
-#     },
-#     "print_background": True,
-#     "prefer_css_page_size": True,
-#     "display_header_footer": False,
-#     # "header_template": "<div style='font-size:10px; text-align:center;'>Header</div>",
-#     # "footer_template": "<div style='font-size:10px; text-align:center;'>Page <span class='pageNumber'></span></div>",
-# }
-
-# html_to_pdf(resume_html, "resume_custom.pdf", pdf_options)
+if __name__ == "__main__":
+    # Example usage
+    html_file = "outputs/resume.html"
+    pdf_output = "outputs/resume.pdf"
+    html_file_to_pdf(html_file, pdf_output)
+    
+    print(f"Converted {html_file} to {pdf_output}")

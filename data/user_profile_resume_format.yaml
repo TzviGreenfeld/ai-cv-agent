@@ -1,50 +1,79 @@
 candidate:
-  name: Bobby Boy
+  name: Tzvi Greenfeld
   title: Software Engineer
 
 summary: >
-  Software Engineer specializing in scalable cloud services and backend systems.
+  Software Engineer (ex-Microsoft) specializing in scalable cloud services and high-performance backend systems. 
+  Skilled in C#, .NET, REST APIs, CI/CD pipelines, and distributed architectures, with proven success in reducing 
+  service latency by 95%+ and improving system reliability. Strong track record in secure cloud deployments (Azure Gov) 
+  and collaborating with cross-functional teams.
 
 contact:
-  - "+972-50-123-4567"
-  - bobby@example.com
-  - linkedin.com/in/bobby
-  - github.com/bobby  # Added github as required by the class
+  - "+972545545302"
+  - tzvigreenfield@gmail.com
+  - linkedin.com/in/tzvigr
+  - github.com/TzviGreenfeld
 
 experience:
   - title: Software Engineer
-    dates: 05/2022 - Present
+    dates: 05/2024 - Present
     company: Microsoft
-    description: Building scalable APIs and cloud services
+    description: Backend and cloud development in large-scale security systems
     achievements:
-      - Built scalable APIs using ASP.NET and Azure
-      - Reduced service latency by 95% through caching strategies
-  - title: Junior Developer
-    dates: 06/2020 - 04/2022
-    company: StartupX
-    description: Full-stack development and DevOps
+      - Owned and optimized a core security configuration pipeline in Microsoft Defender for Cloud, processing 200+ RPS across 1,000+ enterprise tenants; reduced processing latency from ~20 minutes to 1 minute (95% improvement) using concurrency. Unblocked large customers, resolved high-priority tickets, and improved SLA compliance.
+      - Delivered new product features in collaboration with PMs and designers; ensured stability with strong automated test coverage.
+  - title: Software Engineer Intern
+    dates: 08/2023 - 04/2024
+    company: Tenable
+    description: Full-stack feature development across frontend and backend systems
     achievements:
-      - Developed CI/CD pipelines
-      - Implemented secure coding practices
+      - Enhanced frontend analytics by integrating user telemetry into Angular dashboards, enabling data-driven UX improvements.
+      - Increased backend reliability by raising automated test coverage 20% in Node.js services, strengthening stability and reducing regressions.
+      - Contributed to shared React component libraries, accelerating cross-team feature delivery and improving UI consistency.
+      - Improved data processing pipelines by extending Python/SQLAlchemy automation for PostgreSQL, reducing manual intervention and boosting accuracy.
 
 education:
   - degree: Bachelor of Science in Computer Science
-    graduation_date: 05/2020
-    university: University of Technology
+    graduation_date: 07/2023
+    university: Ben-Gurion University - Beer Sheva
     details:
-      - "GPA: 3.7/4.0"
-      - "Dean's List"
+      - "GPA: 85"
 
 skills:
-  - name: Programming Languages
+  - name: Programming
     skills:
-      - Python
       - C#
-  - name: Cloud & Infrastructure
+      - Python
+      - JavaScript/TypeScript
+      - Java
+  - name: Backend & Frameworks
+    skills:
+      - .NET
+      - Node.js
+      - SQLAlchemy
+  - name: Frontend
+    skills:
+      - React
+      - Angular
+  - name: Cloud & DevOps
     skills:
       - Azure
+      - CI/CD
+      - GitHub Actions
       - Docker
-  - name: Frameworks
+      - Kubernetes
+  - name: Databases
     skills:
-      - FastAPI
-      - ASP.NET
+      - PostgreSQL
+      - CosmosDB
+  - name: APIs & Architecture
+    skills:
+      - REST APIs
+      - Microservices
+      - Distributed Systems
+      - Authentication & Authorization (OAuth2, OpenID Connect)
+  - name: Security
+    skills:
+      - Secure Coding
+      - Zero Trust Architecture
+      - Audit Logging

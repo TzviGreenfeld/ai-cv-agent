@@ -149,7 +149,7 @@ Return ONLY the JSON object, no additional text or formatting."""
             
             return job_analysis
         
-        @tool
+        @tool # just for debugging
         def create_complete_tailored_resume_with_analysis(job_url: str, output_name: str = "tailored_resume") -> str:
             """Complete workflow with detailed analysis: read job, analyze changes, create tailored resume, and export all formats"""
             import yaml
@@ -164,7 +164,7 @@ Return ONLY the JSON object, no additional text or formatting."""
             
             
             # Save job analysis
-            analysis_path = f"outputs/{output_name}_job_analysis.json"
+            analysis_path = f"outputs/debug/{output_name}_job_analysis.json"
             with open(analysis_path, 'w', encoding='utf-8') as f:
                 f.write(job_analysis)
             
@@ -219,7 +219,7 @@ Format your response as:
                 f.write(tailored_yaml)
             
             # Save changes report
-            changes_path = f"outputs/{output_name}_changes_report.txt"
+            changes_path = f"outputs/debug/{output_name}_changes_report.txt"
             with open(changes_path, 'w', encoding='utf-8') as f:
                 f.write("RESUME TAILORING REPORT\n")
                 f.write("=" * 50 + "\n\n")
@@ -314,18 +314,18 @@ if __name__ == "__main__":
     
     agent = LangChainCVAgent()
     
-    # Test 1: Basic profile check
-    print("\nTest 1: Checking user profile")
-    response = agent.run("Show me my profile")
-    print(f"Response: {response[:300]}...")
+    # # Test 1: Basic profile check
+    # print("\nTest 1: Checking user profile")
+    # response = agent.run("Show me my profile")
+    # print(f"Response: {response[:300]}...")
     
     # Test 2: Complete workflow
+    print("Creating a tailored resume")
     print("\n" + "="*50)
-    print("Test 2: Creating a tailored resume")
     response = agent.run("""Create a complete tailored resume for a the position.
-    Use the job URL: https://www.metacareers.com/jobs/1439909109913818
+    Use the job URL: https://www.activefence.com/careers/?comeet_pos=FD.B54&coref=1.10.r94_41D&t=1756629558672
     Name the output: 'test_resume'""")
     print(f"\nResponse: {response}")
     
     print("\n" + "="*50)
-    print("Testing complete! Check the 'outputs' directory for generated files.")
+    print("complete! Check the 'outputs' directory for generated files.")
