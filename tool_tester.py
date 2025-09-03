@@ -11,7 +11,7 @@ import re
 from tools.user_profile import read_user_profile
 from tools.cv_builder import generate_cv_html
 from tools.pdf_exporter import html_file_to_pdf
-from utils.resume_parser import load_yaml_to_resume_data
+from tools.resume_parser import load_yaml_to_resume_data
 
 # --- Pick which tool to run ---
 PARAMS = {
