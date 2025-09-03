@@ -13,10 +13,10 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # Import our existing tools
 from tools.job_reader import read_job_description
-from tools.cv_builder import ResumeData, generate_cv_html
+from tools.cv_builder import generate_cv_html
 from tools.pdf_exporter import html_file_to_pdf
 from tools.user_profile import read_user_profile
-from utils.resume_parser import load_yaml_to_resume_data
+from tools.resume_parser import load_yaml_to_resume_data
 
 # Import prompts
 from agent.prompts import (
@@ -197,7 +197,7 @@ class LangChainCVAgent:
                 f.write("-" * 30 + "\n")
                 f.write(changes_made)
             
-            # Step 4: Convert YAML to ResumeData and generate HTML
+            # Step 4: Convert YAML toand generate HTML
             resume_data = load_yaml_to_resume_data(yaml_path)
             html_path = f"outputs/{output_name}.html"
             generate_cv_html(resume_data, html_path)
@@ -225,7 +225,8 @@ class LangChainCVAgent:
             
             return summary
 
-        return [read_job, get_user_profile, create_tailored_resume_yaml, build_resume_from_yaml, export_to_pdf, analyze_job_posting, create_complete_tailored_resume_with_analysis]
+        return [read_job, get_user_profile, create_tailored_resume_yaml, build_resume_from_yaml, export_to_pdf, analyze_job_posting]
+        # return [read_job, get_user_profile, create_tailored_resume_yaml, build_resume_from_yaml, export_to_pdf, analyze_job_posting, create_complete_tailored_resume_with_analysis]
 
 
     def _create_agent(self):
