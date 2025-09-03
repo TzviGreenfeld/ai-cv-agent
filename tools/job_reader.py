@@ -2,6 +2,19 @@ import asyncio
 from crawl4ai import AsyncWebCrawler
 from crawl4ai.async_configs import  CrawlerRunConfig
 
+excluded_tags = [
+        "script", "style", "nav", "header", "footer", 
+        "aside", "button", "input", "form", "select", 
+        "textarea", "svg", "iframe"
+    ]
+
+excluded_selector = """
+        .cookie-banner, .privacy-notice, .social-share,
+        [role="navigation"], [role="banner"], [role="contentinfo"],
+        .navbar, .header, .footer, .sidebar, .menu,
+        [class*="cookie"], [class*="consent"], [class*="share"]
+    """
+
 async def read_job_description(url: str) -> str:
     result = await read_url(url)
     return result
@@ -12,20 +25,11 @@ async def read_url(url: str) -> str:
     crawler_run_config = CrawlerRunConfig(
         wait_until="networkidle", 
         verbose=False,
-        excluded_tags=[
-        "script", "style", "nav", "header", "footer", 
-        "aside", "button", "input", "form", "select", 
-        "textarea", "svg", "iframe"
-    ],
-        excluded_selector="""
-        .cookie-banner, .privacy-notice, .social-share,
-        [role="navigation"], [role="banner"], [role="contentinfo"],
-        .navbar, .header, .footer, .sidebar, .menu,
-        [class*="cookie"], [class*="consent"], [class*="share"]
-    """,
-    remove_forms=True,
-    keep_data_attributes=False,
-    only_text=False,
+        excluded_tags=excluded_tags,
+        excluded_selector=excluded_selector,
+        remove_forms=True,
+        keep_data_attributes=False,
+        only_text=False,
         # delay_before_return_html=2
     )
     
