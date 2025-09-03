@@ -13,10 +13,10 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # Import our existing tools
 from tools.job_reader import read_job_description
-from tools.cv_builder import generate_cv_html
-from tools.pdf_exporter import html_file_to_pdf
 from tools.user_profile import read_user_profile
-from tools.resume_parser import load_yaml_to_resume_data
+from tools.resume_parser import convert_raw_resume_to_resume_data
+from tools.html_cv_builder import generate_cv_html
+from tools.pdf_exporter import html_to_pdf
 
 # Import prompts
 from agent.prompts import (
@@ -53,54 +53,47 @@ class LangChainCVAgent:
     def _create_tools(self):
         """Wrap existing tools for LangChain"""
         
-        @tool
-        def read_job(url: str) -> str:
-            """Fetch and extract job description from a URL"""
-            return read_job_description(url)
+        # @tool
+        # def read_job(url: str) -> str:
+        #     """Fetch and extract job description from a URL"""
+        #     return read_job_description(url)
+        
+        # @tool
+        # def get_user_profile() -> str:
+        #     """Get the user's profile information"""
+        #     profile = read_user_profile()
+        #     return str(profile)
         
         @tool
-        def get_user_profile() -> str:
-            """Get the user's profile information"""
-            profile = read_user_profile()
-            return str(profile)
-        
-        @tool
-        def create_tailored_resume_yaml(job_description: str, output_path: str = "outputs/tailored_resume.yaml") -> str:
+        def create_tailored_resume_yaml(job_description: str, user_data: dict) -> str:
             """Create a tailored resume YAML file based on job description and user profile"""
             import yaml
             
-            # Get the user's base profile
-            user_profile = read_user_profile()
-            
-            # Use LLM to create tailored version
+                       # Use LLM to create tailored version
             tailoring_prompt = TAILORING_PROMPT.format(
                 job_description=job_description,
-                user_profile=yaml.dump(user_profile, default_flow_style=False)
+                user_profile=yaml.dump(user_data, default_flow_style=False)
             )
 
             response = self.llm.invoke(tailoring_prompt)
             tailored_yaml = response.content
-            
-            # Save the tailored YAML
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(tailored_yaml)
-            
-            return f"Tailored resume YAML created at: {output_path}"
+
+            return tailored_yaml
+
+        # @tool
+        # def build_resume_from_yaml(yaml_path: str, output_path: str = "outputs/resume.html") -> str:
+        #     """Build an HTML resume from a YAML file"""
+        #     resume_data = load_yaml_to_resume_data(yaml_path)
+        #     generate_cv_html(resume_data, output_path)
+        #     return f"Resume HTML created at: {output_path}"
         
-        @tool
-        def build_resume_from_yaml(yaml_path: str, output_path: str = "outputs/resume.html") -> str:
-            """Build an HTML resume from a YAML file"""
-            resume_data = load_yaml_to_resume_data(yaml_path)
-            generate_cv_html(resume_data, output_path)
-            return f"Resume HTML created at: {output_path}"
-        
-        @tool
-        def export_to_pdf(html_path: str, pdf_path: str = None) -> str:
-            """Convert HTML resume to PDF"""
-            if not pdf_path:
-                pdf_path = html_path.replace('.html', '.pdf')
-            html_file_to_pdf(html_path, pdf_path)
-            return f"PDF created at: {pdf_path}"
+        # @tool
+        # def export_to_pdf(html_path: str, pdf_path: str = None) -> str:
+        #     """Convert HTML resume to PDF"""
+        #     if not pdf_path:
+        #         pdf_path = html_path.replace('.html', '.pdf')
+        #     html_file_to_pdf(html_path, pdf_path)
+        #     return f"PDF created at: {pdf_path}"
 
         @tool
         def analyze_job_posting(job_url: str) -> str:

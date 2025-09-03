@@ -1,7 +1,6 @@
 from playwright.sync_api import sync_playwright
-import os
 
-def html_to_pdf(html_content: str, output_path: str, options: dict = None):
+def html_to_pdf(html_content: str, output_path: str):
     """
     Convert HTML string to PDF using Playwright
     
@@ -22,32 +21,28 @@ def html_to_pdf(html_content: str, output_path: str, options: dict = None):
         "prefer_css_page_size": True
     }
     
-    if options:
-        default_options.update(options)
-    
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
-        page.set_content(html_content)
-        
-        # Wait for any images or fonts to load
-        page.wait_for_load_state('networkidle')
-        
-        page.pdf(path=output_path, **default_options)
-        browser.close()
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.set_content(html_content)
 
-def html_file_to_pdf(html_file_path: str, output_path: str = "outputs/cv.pdf", options: dict = None):
-    """Convert HTML file to PDF"""
-    with open(html_file_path, 'r', encoding='utf-8') as f:
-        html_content = f.read()
-    
-    html_to_pdf(html_content, output_path, options)
+            # Wait for any images or fonts to load
+            page.wait_for_load_state('networkidle')
+            
+            page.pdf(path=output_path, **default_options)
+            browser.close()
+    except Exception as e:
+        print(f"Error generating PDF: {e}")
+
 
 
 if __name__ == "__main__":
     # Example usage
     html_file = "outputs/resume.html"
+    with open(html_file, 'r', encoding='utf-8') as f:
+        html_content = f.read()
     pdf_output = "outputs/resume.pdf"
-    html_file_to_pdf(html_file, pdf_output)
-    
+    html_to_pdf(html_content, pdf_output)
+
     print(f"Converted {html_file} to {pdf_output}")

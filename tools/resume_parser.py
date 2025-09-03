@@ -2,12 +2,9 @@
 Resume YAML Parser using Pydantic for robust validation and parsing.
 Converts YAML data to the existing ResumeData class structure.
 """
-
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional
-import yaml
-from pathlib import Path
-from tools.cv_builder import ResumeData
+from tools.html_cv_builder import ResumeData
 
 
 class CandidateModel(BaseModel):
@@ -71,37 +68,9 @@ class ResumeYAMLModel(BaseModel):
         extra = 'ignore'
 
 
-def load_yaml_to_resume_data(yaml_path: str) -> ResumeData:
-    """
-    Load YAML file and convert to ResumeData instance.
-    
-    Args:
-        yaml_path: Path to the YAML file
-        
-    Returns:
-        ResumeData instance populated with the YAML data
-        
-    Raises:
-        FileNotFoundError: If the YAML file doesn't exist
-        yaml.YAMLError: If the YAML is malformed
-        ValidationError: If the data doesn't match expected structure
-    """
-    # Check if file exists
-    if not Path(yaml_path).exists():
-        raise FileNotFoundError(f"YAML file not found: {yaml_path}")
-    
-    # Load YAML data
+def convert_raw_resume_to_resume_data(raw_resume: dict) -> ResumeData:
     try:
-        with open(yaml_path, 'r', encoding='utf-8') as f:
-            raw_data = yaml.safe_load(f)
-            if raw_data is None:
-                raw_data = {}
-    except yaml.YAMLError as e:
-        raise yaml.YAMLError(f"Error parsing YAML file: {e}")
-    
-    # Parse with Pydantic model (handles validation and defaults)
-    try:
-        model = ResumeYAMLModel(**raw_data)
+        model = ResumeYAMLModel(**raw_resume)
     except Exception as e:
         # Provide helpful error message
         raise ValueError(f"Error validating resume data: {e}")
@@ -148,31 +117,11 @@ def load_yaml_to_resume_data(yaml_path: str) -> ResumeData:
     return resume
 
 
-def load_yaml_safe(yaml_path: str, default_on_error: bool = True) -> Optional[ResumeData]:
-    """
-    Safely load YAML with error handling.
-    
-    Args:
-        yaml_path: Path to the YAML file
-        default_on_error: If True, return empty ResumeData on error; if False, return None
-        
-    Returns:
-        ResumeData instance or None if error and default_on_error is False
-    """
-    try:
-        return load_yaml_to_resume_data(yaml_path)
-    except Exception as e:
-        print(f"Error loading resume from {yaml_path}: {e}")
-        if default_on_error:
-            return ResumeData()
-        return None
-
-
-# Example usage and testing
 if __name__ == "__main__":
-    # Test with the created YAML file
+    from tools.user_profile import read_user_profile
+
     try:
-        resume = load_yaml_to_resume_data("../data/user_profile_resume_format.yaml")
+        resume = read_user_profile("data/user_profile_resume_format.yaml")
         print("Successfully loaded resume:")
         print(f"Name: {resume.candidate['name']}")
         print(f"Title: {resume.candidate['title']}")

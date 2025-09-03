@@ -2,6 +2,10 @@ import os
 from jinja2 import Environment, FileSystemLoader
 from typing import Dict, List, Any, Optional
 
+from dotenv import load_dotenv
+load_dotenv()
+
+SAVE_ARTIFACTS = os.getenv("DEBUG", "false").lower() == "true"
 
 class ResumeData:
     """Data structure for resume information"""
@@ -62,28 +66,37 @@ class ResumeData:
             "education": self.education,
             "skills": self.skills
         }
-
-def generate_cv_html(resume_data: Optional[ResumeData] = None, output_path: str = "templates/resume.html") -> str:
-    """Generate HTML resume from template"""
-    if resume_data is None:
-        raise ValueError("resume_data must be provided")
-
+    
+def get_html_template():
     # Setup Jinja2 environment
     template_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates')
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template('base_template.html')
-    
+    return template
+
+def save_html_to_file(html_content: str, output_path: str = "templates/resume.html"):
+    """Save HTML content to a file"""
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(html_content)
+    print(f"\nHTML generated successfully: {output_path}")
+
+
+def generate_cv_html(resume_data: ResumeData = None) -> str:
+    """Generate HTML resume from template"""
+    if resume_data is None:
+        raise ValueError("resume_data must be provided")
+
+    template = get_html_template()
+
     # Debug: Print the data structure
     data = resume_data.to_dict()
     
     # Render template
     html_content = template.render(**data)
-    
-    # Save to file
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(html_content)
-    
-    print(f"\nResume generated successfully: {output_path}")
+
+    if SAVE_ARTIFACTS:
+        save_html_to_file(html_content)
+
     return html_content
 
 

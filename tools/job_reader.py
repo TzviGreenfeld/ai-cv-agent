@@ -15,10 +15,6 @@ excluded_selector = """
         [class*="cookie"], [class*="consent"], [class*="share"]
     """
 
-async def read_job_description(url: str) -> str:
-    result = await read_url(url)
-    return result
-
 async def read_url(url: str) -> str:
     print(f"Fetching URL: {url}")
 
@@ -49,6 +45,9 @@ async def read_url(url: str) -> str:
     except Exception as e:
         return f"Error fetching job description: {str(e)}"
 
+async def read_job_description(url: str) -> str:
+    result = await read_url(url)
+    return result
 
 if __name__ == "__main__":
     # Test with different job sites
