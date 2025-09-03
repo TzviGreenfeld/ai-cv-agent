@@ -1,86 +1,58 @@
-import trafilatura
-from playwright.sync_api import sync_playwright
-import time
+import asyncio
+from crawl4ai import AsyncWebCrawler
+from crawl4ai.async_configs import  CrawlerRunConfig
 
-def read_job_description(url: str) -> str:
-    return read_url(url)
+async def read_job_description(url: str) -> str:
+    result = await read_url(url)
+    return result
 
-def read_url(url: str) -> str:
+async def read_url(url: str) -> str:
     print(f"Fetching URL: {url}")
-    
-    # First try with trafilatura
-    downloaded = trafilatura.fetch_url(url)
-    
-    if downloaded:
-        # Try with different extraction parameters
-        text = trafilatura.extract(
-            downloaded, 
-            include_links=True,
-            include_formatting=True,
-            favor_precision=False,
-            favor_recall=True
-        )
-        
-        if text:
-            print("Successfully extracted with trafilatura")
-            return text
-    
-    # If trafilatura fails, use playwright for JavaScript-heavy sites
-    print("Trafilatura failed, trying Playwright...")
+
+    crawler_run_config = CrawlerRunConfig(
+        wait_until="networkidle", 
+        verbose=False,
+        excluded_tags=[
+        "script", "style", "nav", "header", "footer", 
+        "aside", "button", "input", "form", "select", 
+        "textarea", "svg", "iframe"
+    ],
+        excluded_selector="""
+        .cookie-banner, .privacy-notice, .social-share,
+        [role="navigation"], [role="banner"], [role="contentinfo"],
+        .navbar, .header, .footer, .sidebar, .menu,
+        [class*="cookie"], [class*="consent"], [class*="share"]
+    """,
+    remove_forms=True,
+    keep_data_attributes=False,
+    only_text=False,
+        # delay_before_return_html=2
+    )
     
     try:
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+        async with AsyncWebCrawler(
+        ) as crawler:
+            result = await crawler.arun(
+                url=url,
+                config=crawler_run_config
+            )
             
-            # Navigate to the URL
-            page.goto(url, wait_until="networkidle")
-            
-            # Wait a bit for dynamic content to load
-            time.sleep(3)
-            
-            # Try to extract text content
-            # For job postings, look for common selectors
-            job_content = None
-            
-            # Try different strategies to find job content
-            selectors = [
-                'main',  # Common main content area
-                '[role="main"]',  # ARIA main role
-                '.job-description',  # Common class for job descriptions
-                '#job-details',  # Common ID
-                'article',  # Article tag
-                'div[class*="job"]',  # Divs with "job" in class name
-                'body'  # Fallback to entire body
-            ]
-            
-            for selector in selectors:
-                try:
-                    element = page.query_selector(selector)
-                    if element:
-                        content = element.inner_text()
-                        if content and len(content) > 100:  # Ensure we have substantial content
-                            job_content = content
-                            print(f"Found content using selector: {selector}")
-                            break
-                except:
-                    continue
-            
-            browser.close()
-            
-            if job_content:
-                return job_content
+            if result.success and result.markdown:
+                return result.markdown
             else:
-                return "Failed to extract content from the page using Playwright."
-                
+                raise ValueError(f"Failed to fetch content. Error: {result.error_message if hasattr(result, 'error_message') else 'Unknown error'}")
+
     except Exception as e:
-        print(f"Playwright error: {str(e)}")
-        return f"Error using Playwright: {str(e)}"
+        return f"Error fetching job description: {str(e)}"
+
 
 if __name__ == "__main__":
-    url = "https://jobs.careers.microsoft.com/global/en/job/1824895"
-    # print(read_job_description(url))
-    result = read_url(url)
-    print("\n" + "="*50 + "\n")
-    print("EXTRACTED CONTENT:")
-    print(result[:1000] + "..." if len(result) > 1000 else result)
+    # Test with different job sites
+    test_urls = [
+        "https://jobs.careers.microsoft.com/global/en/job/1824895",
+        "https://www.google.com/about/careers/applications/jobs/results/115044372650566342-software-engineer-ii-ios-google-notifications?location=Tel%20Aviv%2C%20Israel&q=%22Software%20Engineer%22"
+    ]
+    for url in test_urls:
+        result = asyncio.run(read_job_description(url))
+        print(f"Job Description for {url}:\n{result}\n")
+        print("="*80)
