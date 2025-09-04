@@ -52,8 +52,9 @@ async def read_job_description(url: str) -> str:
 if __name__ == "__main__":
     # Test with different job sites
     test_urls = [
-        "https://jobs.careers.microsoft.com/global/en/job/1824895",
+        # "https://jobs.careers.microsoft.com/global/en/job/1824895",
         "https://www.google.com/about/careers/applications/jobs/results/115044372650566342-software-engineer-ii-ios-google-notifications?location=Tel%20Aviv%2C%20Israel&q=%22Software%20Engineer%22"
+        # "https://www.activefence.com/careers/?comeet_pos=FD.B54&coref=1.10.r94_41D&t=1756629558672" # doesnt work
     ]
     for url in test_urls:
         result = asyncio.run(read_job_description(url))
