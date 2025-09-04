@@ -231,18 +231,7 @@ class LangChainCVAgent:
 if __name__ == "__main__":
     agent = LangChainCVAgent()
 
-    # Test artifact flow
-    print("\n📋 Testing artifact flow with simple query:")
-    print("-" * 60)
     
-    test_query = "Load my user profile and show me the structure"
-    print(f"Query: {test_query}")
-    
-    response = agent.run(test_query)
-    print(f"\nResponse: {response}...")
-    
-    print("\n" + "=" * 60)
-
 
     response = agent.run("""Create a complete tailored resume for a the position.
     Use the job URL: https://www.google.com/about/careers/applications/jobs/results/115044372650566342-software-engineer-ii-ios-google-notifications?location=Tel%20Aviv%2C%20Israel&q=%22Software%20Engineer%22

@@ -53,16 +53,16 @@ def fetch_job_description(url: str) -> str:
         asyncio.set_event_loop(loop)
         try:
             result = loop.run_until_complete(_read_job_description(url))
-            print(f"Fetched job description from {url}")
-            print(result[:500])  # Print first 500 characters for verification
             return result
         finally:
             loop.close()
     except Exception as e:
         raise ToolException(f"Failed to fetch job description: {str(e)}")
     
-@tool(response_format="content_and_artifact")
-def load_user_profile(profile_path: Optional[str] = "data/user_profile_resume_format.yaml") -> tuple[str, Dict[str, Any]]:
+# @tool(response_format="content_and_artifact")
+@tool
+def load_user_profile(profile_path: Optional[str] = "data/user_profile_resume_format.yaml") -> Dict[str, Any]:
+# def load_user_profile(profile_path: Optional[str] = "data/user_profile_resume_format.yaml") -> tuple[str, Dict[str, Any]]:
     """
     Load user's professional profile from YAML file.
     
@@ -70,11 +70,12 @@ def load_user_profile(profile_path: Optional[str] = "data/user_profile_resume_fo
         profile_path: Optional Path to profile YAML (defaults to data/user_profile_resume_format.yaml)
 
     Returns:
-        Tuple of (status message, profile data dict as artifact)
+        User profile data dictionary
     """
     try:
         profile_data = _read_user_profile(profile_path)
-        return "User profile loaded successfully", profile_data # TODO: is this artifact?
+        # return "User profile loaded successfully", profile_data # TODO: is this artifact?
+        return profile_data
     except Exception as e:
         raise ToolException(f"Failed to load user profile: {str(e)}")
 
