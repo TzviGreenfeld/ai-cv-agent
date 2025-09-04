@@ -1,5 +1,6 @@
 import os
 import sys
+from typing import Optional
 from dotenv import load_dotenv
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -61,6 +62,113 @@ class LangChainCVAgent:
         Create and configure all agent tools including LLM-enhanced tools.
         """
         
+        @tool
+        def create_tailored_resume_complete(job_url: str, profile_path: str = "data/user_profile_resume_format.yaml", output_name: str = "test_resume") -> str:
+            """
+            Complete workflow to create a tailored resume from job URL to PDF output.
+            
+            Args:
+                job_url: URL of the job posting
+                profile_path: Path to user profile YAML
+                output_name: Base name for output files (without extension)
+                
+            Returns:
+                Status message indicating success or failure
+            """
+            import yaml
+            import json
+            from pathlib import Path
+            
+            try:
+                # Step 1: Fetch job description
+                print(f"Fetching job description from {job_url}...")
+                import asyncio
+                from tools.job_reader import read_job_description as _read_job_description
+                
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                try:
+                    job_description = loop.run_until_complete(_read_job_description(job_url))
+                finally:
+                    loop.close()
+                
+                # Step 2: Load user profile
+                print(f"Loading user profile from {profile_path}...")
+                from tools.user_profile import read_user_profile as _read_user_profile
+                user_profile = _read_user_profile(profile_path)
+                
+                # Step 3: Tailor resume using LLM
+                print("Tailoring resume to job requirements...")
+                tailoring_prompt = TAILORING_PROMPT.format(
+                    job_description=job_description,
+                    user_profile=yaml.dump(user_profile, default_flow_style=False)
+                )
+                response = self.llm.invoke(tailoring_prompt)
+                tailored_yaml = response.content
+                
+                # Clean YAML response
+                if "```yaml" in tailored_yaml:
+                    tailored_yaml = tailored_yaml.split("```yaml")[1].split("```")[0].strip()
+                elif "```" in tailored_yaml:
+                    tailored_yaml = tailored_yaml.split("```")[1].split("```")[0].strip()
+                
+                tailored_data = yaml.safe_load(tailored_yaml)
+                
+                # Step 4: Convert to ResumeData and generate HTML
+                print("Generating HTML resume...")
+                from tools.resume_parser import convert_raw_resume_to_resume_data
+                from tools.html_cv_builder import generate_cv_html as _generate_cv_html
+                
+                resume_obj = convert_raw_resume_to_resume_data(tailored_data)
+                html_content = _generate_cv_html(resume_obj)
+                
+                # Step 5: Save HTML and convert to PDF
+                print("Converting to PDF...")
+                from tools.pdf_exporter import html_to_pdf as _html_to_pdf
+                
+                # Ensure output directory exists
+                Path("outputs").mkdir(exist_ok=True)
+                                
+                # Convert to PDF
+                pdf_path = f"outputs/{output_name}.pdf"
+                _html_to_pdf(html_content, pdf_path)
+                
+                # Step 6: Generate and save analysis report
+                print("Generating tailoring analysis report...")
+                analysis_prompt = JOB_ANALYSIS_PROMPT.format(job_description=job_description)
+                analysis_response = self.llm.invoke(analysis_prompt)
+                
+                comparison_prompt = f"""
+                Compare the original and tailored resumes and describe what changes were made.
+                
+                Original Profile Summary: {user_profile.get('summary', '')}
+                Tailored Profile Summary: {tailored_data.get('summary', '')}
+                
+                Job Analysis: {analysis_response.content}
+                
+                Provide a detailed report of changes made and why they align with the job requirements.
+                """
+                
+                report_response = self.llm.invoke(comparison_prompt)
+                
+                # Save report
+                Path("outputs/reports").mkdir(parents=True, exist_ok=True)
+                report_path = f"outputs/reports/{output_name}_report.md"
+                with open(report_path, 'w', encoding='utf-8') as f:
+                    f.write(f"# Resume Tailoring Report\n\n")
+                    f.write(f"**Job URL:** {job_url}\n\n")
+                    f.write(f"## Changes Made\n\n")
+                    f.write(report_response.content)
+                
+                return f"""
+Successfully created tailored resume!
+- PDF saved to: {pdf_path}
+- Report saved to: {report_path}
+"""
+                
+            except Exception as e:
+                return f"Error creating tailored resume: {str(e)}"
+        
         @tool(response_format="content_and_artifact")
         def analyze_job_with_llm(job_description: str) -> tuple[str, dict]:
             """
@@ -121,6 +229,12 @@ class LangChainCVAgent:
                 response = self.llm.invoke(tailoring_prompt)
                 tailored_yaml = response.content
                 
+                # Clean YAML response - remove markdown code fences if present
+                if "```yaml" in tailored_yaml:
+                    tailored_yaml = tailored_yaml.split("```yaml")[1].split("```")[0].strip()
+                elif "```" in tailored_yaml:
+                    tailored_yaml = tailored_yaml.split("```")[1].split("```")[0].strip()
+                
                 # Parse the tailored YAML back to dict
                 tailored_data = yaml.safe_load(tailored_yaml)
                 
@@ -131,17 +245,17 @@ class LangChainCVAgent:
         
         @tool(response_format="content_and_artifact")
         def create_detailed_tailoring_analysis(
-            job_analysis: dict, 
-            original_profile: dict,
-            tailored_profile: dict
+            job_analysis: Optional[dict] = None, 
+            original_profile: Optional[dict] = None,
+            tailored_profile: Optional[dict] = None
         ) -> tuple[str, str]:
             """
             Generate detailed report of changes made during tailoring.
             
             Args:
-                job_analysis: Structured job analysis
-                original_profile: Original user profile
-                tailored_profile: Tailored resume data
+                job_analysis: Structured job analysis (optional)
+                original_profile: Original user profile (optional)
+                tailored_profile: Tailored resume data (optional)
                 
             Returns:
                 Tuple of (summary, detailed changes report as artifact)
@@ -149,6 +263,13 @@ class LangChainCVAgent:
             import yaml
             
             try:
+                # Check if we have required data
+                if not tailored_profile:
+                    return "Error: Missing tailored profile data", "Cannot generate report without tailored resume data"
+                
+                if not original_profile:
+                    return "Error: Missing original profile data", "Cannot generate report without original profile data"
+                
                 # Generate a comparison prompt
                 comparison_prompt = f"""
                 Compare the original and tailored resumes and describe what changes were made.
@@ -175,6 +296,8 @@ class LangChainCVAgent:
         
         # Return all tools (simplified tools + LLM-enhanced tools)
         return [
+            # Complete workflow tool
+            create_tailored_resume_complete,
             # Basic artifact-based tools
             fetch_job_description,
             load_user_profile,
@@ -190,9 +313,56 @@ class LangChainCVAgent:
 
     def _create_agent(self):
         """Create the LangChain agent with enhanced prompt"""
-        # Enhanced prompt for CV tailoring
+        # Enhanced prompt for CV tailoring with better data handling instructions
+        enhanced_system_prompt = SYSTEM_PROMPT + """
+
+RECOMMENDED: Use the create_tailored_resume_complete tool for a complete workflow!
+This tool handles the entire process from job URL to PDF output in one step.
+
+If you need to use individual tools, follow this CRITICAL WORKFLOW:
+
+1. Fetch the job description using fetch_job_description(url)
+   - Store the job description text for later use
+
+2. Load user profile using load_user_profile(profile_path)
+   - Store the original profile dict for later use  
+
+3. Use tailor_resume_with_llm(job_description, user_profile) to create a tailored resume
+   - Pass the job description string and user profile dict from steps 1 and 2
+   - This returns a tuple: (message, tailored_resume_dict)
+   - STORE THE TAILORED RESUME DICT - you will need it for later steps
+
+4. Use analyze_job_with_llm(job_description) to analyze the job
+   - Pass the job description from step 1
+   - This returns a tuple: (message, job_analysis_dict)
+   - STORE THE JOB ANALYSIS DICT
+
+5. Build HTML using build_html_resume(resume_data)
+   - Pass the tailored_resume_dict from step 3
+   - This returns a tuple: (message, html_content)
+   - STORE THE HTML CONTENT
+
+6. Convert to PDF using convert_html_to_pdf(html_content, output_path)
+   - Pass the html_content from step 5
+   - Use output path like "outputs/test_resume.pdf"
+
+7. Create analysis using create_detailed_tailoring_analysis(job_analysis, original_profile, tailored_profile)
+   - Pass job_analysis_dict from step 4, original profile from step 2, and tailored_resume_dict from step 3
+   - This returns a tuple: (message, detailed_report)
+   - STORE THE DETAILED REPORT
+
+8. Save the report using save_tailoring_report()
+   - Pass appropriate parameters including the detailed_report from step 7
+
+IMPORTANT: 
+- Tools marked with response_format="content_and_artifact" return a TUPLE of (message, artifact)
+- You MUST extract and use the artifact (second element) for subsequent tool calls
+- DO NOT pass None or empty dicts to tools expecting data from previous steps
+- ALWAYS pass the complete data structures between tools
+"""
+        
         prompt = ChatPromptTemplate.from_messages([
-            ("system", SYSTEM_PROMPT),
+            ("system", enhanced_system_prompt),
             ("user", "{input}"),
             MessagesPlaceholder(variable_name="agent_scratchpad"),
         ])

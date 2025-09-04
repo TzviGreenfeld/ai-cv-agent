@@ -7,8 +7,6 @@ def read_user_profile(yaml_path: str = "data/user_profile_resume_format.yaml") -
     try:
         with open(yaml_path, 'r', encoding='utf-8') as f:
             raw_data = yaml.safe_load(f)
-            print(type(raw_data))
-            print(raw_data)
             if raw_data is None:
                 raise ValueError("YAML file is empty or invalid")
     except yaml.YAMLError as e:

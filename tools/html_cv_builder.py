@@ -1,6 +1,7 @@
 import os
 from jinja2 import Environment, FileSystemLoader
 from typing import Dict, List, Any, Optional
+from pathlib import Path
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -76,8 +77,9 @@ def get_html_template():
 
 def save_html_to_file(html_content: str, output_path: str = "templates/resume.html"):
     """Save HTML content to a file"""
-    with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(html_content)
+    path = Path(output_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(html_content, encoding='utf-8')
     print(f"\nHTML generated successfully: {output_path}")
 
 

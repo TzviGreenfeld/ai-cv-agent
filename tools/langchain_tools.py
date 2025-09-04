@@ -98,17 +98,23 @@ def parse_resume_yaml(yaml_content: str) -> tuple[str, ResumeData]:
         raise ToolException(f"Failed to parse resume YAML: {str(e)}")
 
 @tool(response_format="content_and_artifact")
-def build_html_resume(resume_data: Dict[str, Any]) -> tuple[str, str]:
+def build_html_resume(resume_data: Optional[Dict[str, Any]] = None) -> tuple[str, str]:
     """
     Generate HTML from resume data.
     
     Args:
-        resume_data: Resume data dictionary or ResumeData object
+        resume_data: Resume data dictionary or ResumeData object. If not provided, will use the last parsed resume data.
         
     Returns:
         Tuple of (status message, HTML content as artifact)
     """
     try:
+        # Check if resume_data is provided
+        if resume_data is None or (isinstance(resume_data, dict) and not resume_data):
+            # Try to get the last parsed resume from global context
+            # This is a workaround for the agent not passing the data correctly
+            raise ToolException("Resume data is required. Please provide the parsed resume data from the previous step.")
+        
         # Convert dict to ResumeData if needed
         if isinstance(resume_data, dict):
             resume_obj = convert_raw_resume_to_resume_data(resume_data)
