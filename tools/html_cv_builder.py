@@ -68,12 +68,20 @@ class ResumeData:
             "skills": self.skills
         }
     
-def get_html_template():
+def get_html_template(template_name='base_template.html'):
     # Setup Jinja2 environment
     template_dir = Path(__file__).parent.parent / 'templates'
     env = Environment(loader=FileSystemLoader(template_dir))
-    template = env.get_template('base_template.html')
+    template = env.get_template(template_name)
     return template
+
+def load_css_content(style_name='default'):
+    """Load CSS content from file for embedding in HTML"""
+    css_path = Path(__file__).parent.parent / 'templates' / 'styles' / f'{style_name}-styles.css'
+    if css_path.exists():
+        return css_path.read_text(encoding='utf-8')
+    else:
+        raise FileNotFoundError(f"Style file not found: {css_path}")
 
 def save_html_to_file(html_content: str, output_path: str = "templates/resume.html"):
     """Save HTML content to a file"""
@@ -83,21 +91,46 @@ def save_html_to_file(html_content: str, output_path: str = "templates/resume.ht
     print(f"\nHTML generated successfully: {output_path}")
 
 
-def generate_cv_html(resume_data: ResumeData = None) -> str:
-    """Generate HTML resume from template"""
+def generate_cv_html(resume_data: ResumeData = None, 
+                    style_name: str = 'default',
+                    embed_css: bool = True,
+                    use_dynamic_template: bool = True) -> str:
+    """
+    Generate HTML resume from template
+    
+    Args:
+        resume_data: Resume data object
+        style_name: Name of the style to use (default, modern, classic, etc.)
+        embed_css: Whether to embed CSS in HTML (True) or link to external file (False)
+        use_dynamic_template: Whether to use the new dynamic template
+    """
     if resume_data is None:
         raise ValueError("resume_data must be provided")
 
-    template = get_html_template()
+    # Choose template
+    template_name = 'base_template_dynamic.html' if use_dynamic_template else 'base_template.html'
+    template = get_html_template(template_name)
 
-    # Debug: Print the data structure
+    # Get the data structure
     data = resume_data.to_dict()
+    
+    # Add style configuration
+    if use_dynamic_template:
+        if embed_css:
+            # Load CSS content for embedding
+            data['css_content'] = load_css_content(style_name)
+            data['style_path'] = None
+        else:
+            # Use external CSS file path
+            data['css_content'] = None
+            data['style_path'] = f"styles/{style_name}-styles.css"
     
     # Render template
     html_content = template.render(**data)
 
     if SAVE_ARTIFACTS:
-        save_html_to_file(html_content)
+        output_name = f"templates/resume_{style_name}.html" if style_name != 'default' else "templates/resume.html"
+        save_html_to_file(html_content, output_name)
 
     return html_content
 

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Template</title>
+    <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;600;700&display=swap" rel="stylesheet">
+    {% if css_content %}
+    <!-- Embedded CSS for standalone HTML -->
+    <style>
+        {{ css_content | safe }}
+    </style>
+    {% elif style_path %}
+    <!-- External CSS file -->
+    <link rel="stylesheet" href="{{ style_path }}">
+    {% endif %}
+</head>
+<body>
+    <div class="resume-container">
+        <!-- Left Column - Main Content -->
+        <div class="left-column">
+            <!-- Name and Title Section -->
+            <section class="name-title-section">
+                <h1 class="candidate-name">{{ candidate.name }}</h1>
+                <p class="job-title">{{ candidate.title }}</p>
+            </section>
+
+            <!-- Professional Summary Section -->
+            <section class="professional-summary-section">
+                <h2 class="section-header">PROFESSIONAL SUMMARY</h2>
+                <div class="section-divider"></div>
+                <p class="summary-text">{{ summary }}</p>
+            </section>
+
+            <!-- Experience Section -->
+            <section class="experience-section">
+                <h2 class="section-header">EXPERIENCE</h2>
+                <div class="section-divider"></div>
+                
+                {% for job in experience %}
+                <div class="job-entry">
+                    <div class="job-header">
+                        <h3 class="job-title">{{ job.title }} {{ job.dates }}</h3>
+                        <p class="company-name">{{ job.company }}</p>
+                    </div>
+                    
+                    {% if job.description %}
+                    <p class="job-description">
+                        <strong>{{ job.description }}</strong>
+                    </p>
+                    {% endif %}
+                    
+                    <ul class="achievements-list">
+                        {% for achievement in job.achievements %}
+                        <li class="achievement-item">{{ achievement | safe }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </section>
+
+            <!-- Education Section -->
+            <section class="education-section">
+                <h2 class="section-header">EDUCATION</h2>
+                <div class="section-divider"></div>
+                
+                {% for edu in education %}
+                <div class="education-entry">
+                    <h3 class="degree-title">{{ edu.degree }}, {{ edu.graduation_date }}</h3>
+                    <p class="university-name">{{ edu.university }}</p>
+                    {% if edu.details %}
+                    <ul class="education-details">
+                        {% for detail in edu.details %}
+                        <li class="education-detail">{{ detail }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </section>
+        </div>
+
+        <!-- Right Column - Skills and Contact -->
+        <div class="right-column">
+            <!-- Contact Information -->
+            <section class="contact-section">
+                {% for contact_item in contact %}
+                <div class="contact-item">
+                    <p class="contact-info">{{ contact_item }}</p>
+                </div>
+                {% endfor %}
+            </section>
+
+            <!-- Skills Section -->
+            <section class="skills-section">
+                <h2 class="skills-header">SKILLS</h2>
+                
+                {% for skill_category in skills %}
+                <div class="skill-category">
+                    <h3 class="skill-category-title">{{ skill_category.name }}:</h3>
+                    <p class="skill-list">{{ skill_category.skills | join(', ') }}</p>
+                </div>
+                {% endfor %}
+            </section>
+        </div>
+    </div>
+</body>
+</html>

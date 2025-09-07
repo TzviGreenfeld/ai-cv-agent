@@ -1,5 +1,5 @@
 from playwright.sync_api import sync_playwright
-
+from pathlib import Path
 def html_to_pdf(html_content: str, output_path: str):
     """
     Convert HTML string to PDF using Playwright
@@ -39,10 +39,9 @@ def html_to_pdf(html_content: str, output_path: str):
 
 if __name__ == "__main__":
     # Example usage
-    html_file = "outputs/resume.html"
-    with open(html_file, 'r', encoding='utf-8') as f:
-        html_content = f.read()
-    pdf_output = "outputs/resume.pdf"
+    html_file = Path("outputs/resume.html")
+    html_content = html_file.read_text(encoding='utf-8')
+    pdf_output = Path("outputs/resume.pdf")
     html_to_pdf(html_content, pdf_output)
 
     print(f"Converted {html_file} to {pdf_output}")

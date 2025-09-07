@@ -1,0 +1,293 @@
+/* modern-styles.css - A modern, minimalist resume theme */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: #fafafa;
+    color: #1a1a1a;
+    line-height: 1.6;
+}
+
+.resume-container {
+    width: 210mm; /* A4 width */
+    height: 297mm; /* A4 height */
+    display: flex;
+    margin: 0 auto;
+    background-color: white;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Left Column Styles */
+.left-column {
+    width: 65%;
+    padding: 40px;
+    background-color: white;
+}
+
+.name-title-section {
+    margin-bottom: 30px;
+    border-bottom: 3px solid #2563eb;
+    padding-bottom: 20px;
+}
+
+.candidate-name {
+    font-size: 42px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    letter-spacing: -1px;
+}
+
+.job-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.section-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2563eb;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.section-divider {
+    display: none; /* Remove dividers for cleaner look */
+}
+
+.professional-summary-section {
+    margin-bottom: 35px;
+}
+
+.summary-text {
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: #4b5563;
+}
+
+.experience-section {
+    margin-bottom: 35px;
+}
+
+.job-entry {
+    margin-bottom: 25px;
+    padding-left: 15px;
+    border-left: 2px solid #e5e7eb;
+}
+
+.job-entry:last-child {
+    margin-bottom: 0;
+}
+
+.job-header {
+    margin-bottom: 10px;
+}
+
+.job-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 3px;
+}
+
+.company-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: #2563eb;
+    margin-bottom: 5px;
+}
+
+.job-description {
+    font-size: 11px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 10px;
+    font-style: italic;
+}
+
+.achievements-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.achievement-item {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.6;
+    margin-bottom: 6px;
+    position: relative;
+    padding-left: 20px;
+    color: #4b5563;
+}
+
+.achievement-item::before {
+    content: "→";
+    color: #2563eb;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.achievement-item:last-child {
+    margin-bottom: 0;
+}
+
+.education-section {
+    margin-bottom: 0;
+}
+
+.education-entry {
+    margin-bottom: 20px;
+    padding-left: 15px;
+    border-left: 2px solid #e5e7eb;
+}
+
+.education-entry:last-child {
+    margin-bottom: 0;
+}
+
+.degree-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 3px;
+}
+
+.university-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: #2563eb;
+    margin-bottom: 8px;
+}
+
+.education-details {
+    list-style: none;
+    padding-left: 0;
+}
+
+.education-detail {
+    font-size: 10px;
+    font-weight: 400;
+    color: #4b5563;
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 4px;
+}
+
+.education-detail::before {
+    content: "→";
+    color: #2563eb;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* Right Column Styles */
+.right-column {
+    width: 35%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 40px 30px;
+    color: white;
+}
+
+.contact-section {
+    margin-bottom: 45px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.contact-item {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.contact-item:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.contact-info {
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.skills-section {
+    margin-bottom: 0;
+}
+
+.skills-header {
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.skill-category {
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.skill-category:last-child {
+    margin-bottom: 0;
+}
+
+.skill-category-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.skill-list {
+    font-size: 10px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+}
+
+/* Print Styles */
+@media print {
+    .resume-container {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        box-shadow: none;
+    }
+    
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        background-color: white;
+    }
+}
+
+/* Strong text styling */
+strong {
+    font-weight: 600;
+    color: #1a1a1a;
+}
