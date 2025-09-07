@@ -1,0 +1,331 @@
+/* reversed-styles.css - Resume theme with reversed column layout */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Saira', sans-serif;
+    background-color: white;
+    color: #333333;
+    line-height: 1.4;
+}
+
+.resume-container {
+    width: 210mm; /* A4 width */
+    height: 297mm; /* A4 height */
+    display: flex;
+    flex-direction: row-reverse; /* This reverses the column order */
+    margin: 0 auto;
+    background-color: white;
+}
+
+/* Right Column (Now appears on left due to flex-direction: row-reverse) */
+.right-column {
+    width: 35%;
+    background-color: #2c3e50;
+    padding: 20mm 15mm 20mm 15mm;
+    color: white;
+}
+
+.contact-section {
+    margin-bottom: 40px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid #e74c3c;
+}
+
+.contact-item {
+    margin-bottom: 15px;
+}
+
+.contact-item:last-child {
+    margin-bottom: 0;
+}
+
+.contact-info {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.4;
+    word-break: break-all;
+    color: #ecf0f1;
+}
+
+.skills-section {
+    margin-bottom: 0;
+}
+
+.skills-header {
+    font-size: 14px;
+    font-weight: 700;
+    color: #e74c3c;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.skill-category {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.skill-category:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.skill-category-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #e74c3c;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.skill-list {
+    font-size: 10px;
+    font-weight: 400;
+    color: #ecf0f1;
+    line-height: 1.6;
+}
+
+/* Left Column (Now appears on right due to flex-direction: row-reverse) */
+.left-column {
+    width: 65%;
+    padding: 20mm 20mm 20mm 15mm;
+    background-color: #f8f9fa;
+}
+
+.name-title-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.candidate-name {
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.job-title {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.section-header {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.section-divider {
+    width: 50px;
+    height: 3px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin-bottom: 15px;
+    border-radius: 2px;
+}
+
+.professional-summary-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.summary-text {
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.6;
+    text-align: justify;
+    color: #495057;
+}
+
+.experience-section {
+    margin-bottom: 25px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.job-entry {
+    margin-bottom: 20px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.job-entry::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+
+.job-entry:last-child {
+    margin-bottom: 0;
+}
+
+.job-header {
+    margin-bottom: 8px;
+}
+
+.job-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 2px;
+}
+
+.company-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 5px;
+}
+
+.job-description {
+    font-size: 10px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.achievements-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.achievement-item {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 15px;
+    text-align: justify;
+    color: #6c757d;
+}
+
+.achievement-item::before {
+    content: "▸";
+    color: #764ba2;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.achievement-item:last-child {
+    margin-bottom: 0;
+}
+
+.education-section {
+    margin-bottom: 0;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.education-entry {
+    margin-bottom: 15px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.education-entry::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+
+.education-entry:last-child {
+    margin-bottom: 0;
+}
+
+.degree-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 2px;
+}
+
+.university-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #667eea;
+    margin-bottom: 5px;
+}
+
+.education-details {
+    list-style: none;
+    padding-left: 0;
+}
+
+.education-detail {
+    font-size: 10px;
+    font-weight: 400;
+    color: #6c757d;
+    position: relative;
+    padding-left: 15px;
+}
+
+.education-detail::before {
+    content: "▸";
+    color: #764ba2;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* Print Styles */
+@media print {
+    .resume-container {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+    }
+    
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .left-column {
+        background-color: #f8f9fa !important;
+    }
+}
+
+/* Strong text styling */
+strong {
+    font-weight: 600;
+}
