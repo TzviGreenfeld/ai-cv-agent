@@ -70,14 +70,16 @@ class ResumeData:
     
 def get_html_template(template_name='base_template.html'):
     # Setup Jinja2 environment
-    template_dir = Path(__file__).parent.parent / 'templates'
+    # Look for templates in the project root templates directory
+    template_dir = Path(__file__).parent.parent.parent.parent / 'templates'
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template(template_name)
     return template
 
 def load_css_content(style_name='default'):
     """Load CSS content from file for embedding in HTML"""
-    css_path = Path(__file__).parent.parent / 'templates' / 'styles' / f'{style_name}-styles.css'
+    # Look for styles in the project root templates/styles directory
+    css_path = Path(__file__).parent.parent.parent.parent / 'templates' / 'styles' / f'{style_name}-styles.css'
     if css_path.exists():
         return css_path.read_text(encoding='utf-8')
     else:

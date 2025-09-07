@@ -2,9 +2,14 @@
 Test script to demonstrate dynamic style loading in Jinja2 templates
 """
 
+import sys
 from pathlib import Path
-from ..tools.html_cv_builder import ResumeData, generate_cv_html
-from ..tools.pdf_exporter import html_to_pdf
+
+# Add src directory to Python path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
+from ai_cv_agent.tools.html_cv_builder import ResumeData, generate_cv_html
+from ai_cv_agent.tools.pdf_exporter import html_to_pdf
 
 def create_sample_resume_data():
     """Create sample resume data for testing"""
@@ -174,7 +179,7 @@ def test_dynamic_styles():
     return output_paths
 
 
-def make_pdfs(output_paths, output_path):
+def make_pdfs(output_paths):
     """Convert generated HTML files to PDFs"""
     for html_path in output_paths:
         if html_path.exists():
@@ -188,8 +193,7 @@ def make_pdfs(output_paths, output_path):
                 print(f"   ✗ Error converting to PDF: {e}")
         else:
             print(f"\n   ✗ HTML file not found, skipping PDF conversion: {html_path}")
-    html_to_pdf(html_content, output_path)
 
 if __name__ == "__main__":
     output_paths = test_dynamic_styles()
-    make_pdfs(output_paths, Path("outputs/resume.pdf"))
+    make_pdfs(output_paths)

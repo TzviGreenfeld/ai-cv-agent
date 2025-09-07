@@ -4,7 +4,7 @@ Converts YAML data to the existing ResumeData class structure.
 """
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional
-from tools.html_cv_builder import ResumeData
+from .html_cv_builder import ResumeData
 
 
 class CandidateModel(BaseModel):
@@ -118,7 +118,7 @@ def convert_raw_resume_to_resume_data(raw_resume: dict) -> ResumeData:
 
 
 if __name__ == "__main__":
-    from tools.user_profile import read_user_profile
+    from .user_profile import read_user_profile
 
     try:
         resume = read_user_profile("data/user_profile_resume_format.yaml")

@@ -1,4 +1,4 @@
-from agent.cv_agent import create_cv_agent
+from .agent.cv_agent import create_cv_agent
 
 def main():
     agent = create_cv_agent()

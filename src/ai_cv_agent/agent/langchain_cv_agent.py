@@ -1,9 +1,6 @@
 import os
-import sys
 from typing import Optional
 from dotenv import load_dotenv
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from langchain_openai import AzureChatOpenAI
 from langchain.agents import create_openai_functions_agent, AgentExecutor
@@ -11,7 +8,7 @@ from langchain.tools import tool
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # Import refactored tools with artifacts support
-from tools.langchain_tools import (
+from ..tools.langchain_tools import (
     fetch_job_description,
     load_user_profile,
     parse_resume_yaml,
@@ -20,9 +17,8 @@ from tools.langchain_tools import (
     save_tailoring_report
 )
 
-
 # Import prompts
-from agent.prompts import (
+from .prompts import (
     SYSTEM_PROMPT,
     TAILORING_PROMPT,
     JOB_ANALYSIS_PROMPT,
@@ -83,7 +79,7 @@ class LangChainCVAgent:
                 # Step 1: Fetch job description
                 print(f"Fetching job description from {job_url}...")
                 import asyncio
-                from tools.job_reader import read_job_description as _read_job_description
+                from ..tools.job_reader import read_job_description as _read_job_description
                 
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
@@ -94,7 +90,7 @@ class LangChainCVAgent:
                 
                 # Step 2: Load user profile
                 print(f"Loading user profile from {profile_path}...")
-                from tools.user_profile import read_user_profile as _read_user_profile
+                from ..tools.user_profile import read_user_profile as _read_user_profile
                 user_profile = _read_user_profile(profile_path)
                 
                 # Step 3: Tailor resume using LLM
@@ -116,15 +112,15 @@ class LangChainCVAgent:
                 
                 # Step 4: Convert to ResumeData and generate HTML
                 print("Generating HTML resume...")
-                from tools.resume_parser import convert_raw_resume_to_resume_data
-                from tools.html_cv_builder import generate_cv_html as _generate_cv_html
+                from ..tools.resume_parser import convert_raw_resume_to_resume_data
+                from ..tools.html_cv_builder import generate_cv_html as _generate_cv_html
                 
                 resume_obj = convert_raw_resume_to_resume_data(tailored_data)
                 html_content = _generate_cv_html(resume_obj)
                 
                 # Step 5: Save HTML and convert to PDF
                 print("Converting to PDF...")
-                from tools.pdf_exporter import html_to_pdf as _html_to_pdf
+                from ..tools.pdf_exporter import html_to_pdf as _html_to_pdf
                 
                 # Ensure output directory exists
                 Path("outputs").mkdir(exist_ok=True)
@@ -132,6 +128,11 @@ class LangChainCVAgent:
                 # Convert to PDF
                 pdf_path = f"outputs/{output_name}.pdf"
                 _html_to_pdf(html_content, pdf_path)
+                
+                # Save HTML file as well
+                html_path = f"outputs/{output_name}.html"
+                with open(html_path, 'w', encoding='utf-8') as f:
+                    f.write(html_content)
                 
                 # Step 6: Generate and save analysis report
                 print("Generating tailoring analysis report...")
@@ -163,6 +164,7 @@ class LangChainCVAgent:
                 return f"""
 Successfully created tailored resume!
 - PDF saved to: {pdf_path}
+- HTML saved to: {html_path}
 - Report saved to: {report_path}
 """
                 
@@ -396,15 +398,12 @@ IMPORTANT:
         except Exception as e:
             return f"Error executing agent: {str(e)}"
 
-
-
 if __name__ == "__main__":
     agent = LangChainCVAgent()
-
     
-
     response = agent.run("""Create a complete tailored resume for a the position.
     Use the job URL: https://www.google.com/about/careers/applications/jobs/results/115044372650566342-software-engineer-ii-ios-google-notifications?location=Tel%20Aviv%2C%20Israel&q=%22Software%20Engineer%22
     my profile is at data/user_profile_resume_format.yaml
     create a resume tailored to the job description based on my profile, and save it as pdf. also create a detailed report of changes made.
     Name the output: 'test_resume'""")
+    print(response)

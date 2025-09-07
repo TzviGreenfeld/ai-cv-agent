@@ -9,9 +9,9 @@ from pathlib import Path
 import json
 
 # Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from agent.langchain_cv_agent import LangChainCVAgent
+from src.ai_cv_agent.agent.langchain_cv_agent import LangChainCVAgent
 
 def test_standalone_job_analysis():
     """Test that the agent can analyze a job posting independently."""
