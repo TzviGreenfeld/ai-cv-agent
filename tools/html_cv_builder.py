@@ -70,7 +70,7 @@ class ResumeData:
     
 def get_html_template():
     # Setup Jinja2 environment
-    template_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'templates')
+    template_dir = Path(__file__).parent.parent / 'templates'
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template('base_template.html')
     return template
