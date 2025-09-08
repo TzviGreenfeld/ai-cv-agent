@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resume Template</title>
     <link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;600;700&display=swap" rel="stylesheet">
+    
     {% if css_content %}
-    <!-- Embedded CSS for standalone HTML -->
+    <!-- Embedded CSS -->
     <style>
         {{ css_content | safe }}
     </style>
     {% elif style_path %}
-    <!-- External CSS file -->
+    <!-- External CSS -->
     <link rel="stylesheet" href="{{ style_path }}">
+    {% else %}
+    <!-- Default embedded CSS -->
+    <style>
+        {% include 'styles/default-styles.css' %}
+    </style>
     {% endif %}
 </head>
 <body>
