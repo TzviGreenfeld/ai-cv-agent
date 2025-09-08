@@ -1,0 +1,320 @@
+/* classic-styles.css - Traditional old-school CV style */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Georgia', 'Garamond', 'Times New Roman', serif;
+    background-color: white;
+    color: #2c3e50;
+    line-height: 1.6;
+    font-size: 12pt;
+}
+
+.resume-container {
+    width: 210mm; /* A4 width */
+    min-height: 297mm; /* A4 height */
+    margin: 0 auto;
+    background-color: white;
+    padding: 25mm 25mm 30mm 25mm;
+    display: block; /* Single column layout */
+}
+
+/* Hide the original column structure */
+.left-column,
+.right-column {
+    width: 100%;
+    padding: 0;
+    background-color: transparent;
+}
+
+/* Name and Title Section */
+.name-title-section {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #c0392b;
+    padding-bottom: 15px;
+}
+
+.candidate-name {
+    font-size: 24pt;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.job-title {
+    font-size: 14pt;
+    font-weight: normal;
+    color: #34495e;
+    font-style: italic;
+}
+
+/* Contact Section - Horizontal layout */
+.contact-section {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px 0;
+}
+
+.contact-item {
+    display: inline-block;
+    margin: 0 15px;
+}
+
+.contact-info {
+    font-size: 11pt;
+    color: #34495e;
+}
+
+/* Section Headers */
+.section-header {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #c0392b;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #c0392b;
+    padding-bottom: 5px;
+}
+
+.skills-header {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #c0392b;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #c0392b;
+    padding-bottom: 5px;
+}
+
+.section-divider {
+    display: none; /* Hide the colored dividers */
+}
+
+/* Professional Summary */
+.professional-summary-section {
+    margin-bottom: 20px;
+}
+
+.summary-text {
+    font-size: 11pt;
+    line-height: 1.6;
+    text-align: justify;
+    color: #34495e;
+}
+
+/* Experience Section */
+.experience-section {
+    margin-bottom: 20px;
+}
+
+.job-entry {
+    margin-bottom: 15px;
+}
+
+.job-header {
+    margin-bottom: 5px;
+}
+
+.job-title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #2c3e50;
+    display: inline;
+}
+
+.job-title::after {
+    content: " | ";
+    font-weight: normal;
+}
+
+.company-name {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #c0392b;
+    font-style: italic;
+    margin-bottom: 3px;
+}
+
+.job-description {
+    font-size: 11pt;
+    font-weight: normal;
+    color: #333333;
+    margin-bottom: 5px;
+    font-style: italic;
+}
+
+.achievements-list {
+    list-style: none;
+    padding-left: 20px;
+    margin-top: 5px;
+}
+
+.achievement-item {
+    font-size: 11pt;
+    line-height: 1.6;
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 20px;
+    text-align: justify;
+}
+
+.achievement-item::before {
+    content: "•";
+    color: #000000;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* Education Section */
+.education-section {
+    margin-bottom: 20px;
+}
+
+.education-entry {
+    margin-bottom: 10px;
+}
+
+.degree-title {
+    font-size: 12pt;
+    font-weight: bold;
+    color: #2c3e50;
+    display: inline;
+}
+
+.degree-title::after {
+    content: ", ";
+    font-weight: normal;
+}
+
+.university-name {
+    font-size: 12pt;
+    font-weight: normal;
+    color: #c0392b;
+    font-style: italic;
+    margin-bottom: 3px;
+}
+
+.education-details {
+    list-style: none;
+    padding-left: 20px;
+    margin-top: 3px;
+}
+
+.education-detail {
+    font-size: 11pt;
+    color: #333333;
+    position: relative;
+    padding-left: 20px;
+}
+
+.education-detail::before {
+    content: "•";
+    color: #000000;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+/* Skills Section */
+.skills-section {
+    margin-bottom: 20px;
+}
+
+.skill-category {
+    margin-bottom: 8px;
+}
+
+.skill-category-title {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #2c3e50;
+    display: inline;
+}
+
+.skill-category-title::after {
+    content: ": ";
+}
+
+.skill-list {
+    font-size: 11pt;
+    color: #333333;
+    display: inline;
+}
+
+/* Override flex layout from base template */
+.resume-container {
+    display: block !important;
+}
+
+.left-column {
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+.right-column {
+    width: 100% !important;
+    padding: 0 !important;
+    background-color: transparent !important;
+}
+
+/* Ensure contact and skills appear in correct order */
+.right-column {
+    order: -1; /* Move contact to top */
+}
+
+/* Print Styles */
+@media print {
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .resume-container {
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20mm 20mm 25mm 20mm;
+        page-break-after: auto;
+    }
+    
+    .job-entry,
+    .education-entry {
+        page-break-inside: avoid;
+    }
+    
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* Strong text styling */
+strong {
+    font-weight: bold;
+}
+
+/* Additional classic styling */
+a {
+    color: #000000;
+    text-decoration: underline;
+}
+
+/* Page numbers (for print) */
+@page {
+    margin: 15mm;
+    @bottom-center {
+        content: counter(page);
+    }
+}

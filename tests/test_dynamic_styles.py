@@ -128,11 +128,29 @@ def test_dynamic_styles():
         output_path.write_text(html_reversed, encoding='utf-8')
         print(f"   ✓ Saved to: {output_path}")
         print("   Note: Skills/Contact on left, Experience/Education on right")
+        output_paths.append(output_path)
     except Exception as e:
         print(f"   ✗ Error: {e}")
     
-    # Test 4: Generate with external CSS link (not embedded)
-    print("\n4. Generating resume with external CSS link...")
+    # Test 4: Generate with classic style (embedded CSS)
+    print("\n4. Generating resume with CLASSIC style (CSS embedded)...")
+    try:
+        html_classic = generate_cv_html(
+            resume_data=resume_data,
+            style_name='classic',
+            embed_css=True,
+            use_dynamic_template=True
+        )
+        output_path = Path("outputs/resume_classic_embedded.html")
+        output_path.write_text(html_classic, encoding='utf-8')
+        print(f"   ✓ Saved to: {output_path}")
+        print("   Note: Traditional single-column layout with serif fonts")
+        output_paths.append(output_path)
+    except Exception as e:
+        print(f"   ✗ Error: {e}")
+    
+    # Test 5: Generate with external CSS link (not embedded)
+    print("\n5. Generating resume with external CSS link...")
     try:
         html_external = generate_cv_html(
             resume_data=resume_data,
@@ -148,8 +166,8 @@ def test_dynamic_styles():
     except Exception as e:
         print(f"   ✗ Error: {e}")
     
-    # Test 5: Compare with original template (backwards compatibility)
-    print("\n5. Testing backwards compatibility with original template...")
+    # Test 6: Compare with original template (backwards compatibility)
+    print("\n6. Testing backwards compatibility with original template...")
     try:
         html_original = generate_cv_html(
             resume_data=resume_data,
@@ -165,7 +183,7 @@ def test_dynamic_styles():
     print("\n" + "=" * 60)
     print("Summary:")
     print("- Dynamic style loading allows switching between themes")
-    print("- Available themes: default, modern, reversed")
+    print("- Available themes: default, modern, reversed, classic")
     print("- CSS can be embedded (standalone HTML) or linked (requires CSS files)")
     print("- Original template still works for backwards compatibility")
     print("- Check the 'outputs' folder to see the generated HTML files")
