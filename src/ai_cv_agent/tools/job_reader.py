@@ -1,12 +1,22 @@
 import asyncio
 from crawl4ai import AsyncWebCrawler
-from crawl4ai.async_configs import  CrawlerRunConfig
+from crawl4ai.async_configs import CrawlerRunConfig
 
 excluded_tags = [
-        "script", "style", "nav", "header", "footer", 
-        "aside", "button", "input", "form", "select", 
-        "textarea", "svg", "iframe"
-    ]
+    "script",
+    "style",
+    "nav",
+    "header",
+    "footer",
+    "aside",
+    "button",
+    "input",
+    "form",
+    "select",
+    "textarea",
+    "svg",
+    "iframe",
+]
 
 excluded_selector = """
         .cookie-banner, .privacy-notice, .social-share,
@@ -15,11 +25,12 @@ excluded_selector = """
         [class*="cookie"], [class*="consent"], [class*="share"]
     """
 
+
 async def read_url(url: str) -> str:
     print(f"Fetching URL: {url}")
 
     crawler_run_config = CrawlerRunConfig(
-        wait_until="networkidle", 
+        wait_until="networkidle",
         verbose=False,
         excluded_tags=excluded_tags,
         excluded_selector=excluded_selector,
@@ -28,26 +39,26 @@ async def read_url(url: str) -> str:
         only_text=False,
         # delay_before_return_html=2
     )
-    
+
     try:
-        async with AsyncWebCrawler(
-        ) as crawler:
-            result = await crawler.arun(
-                url=url,
-                config=crawler_run_config
-            )
-            
+        async with AsyncWebCrawler() as crawler:
+            result = await crawler.arun(url=url, config=crawler_run_config)
+
             if result.success and result.markdown:
                 return result.markdown
             else:
-                raise ValueError(f"Failed to fetch content. Error: {result.error_message if hasattr(result, 'error_message') else 'Unknown error'}")
+                raise ValueError(
+                    f"Failed to fetch content. Error: {result.error_message if hasattr(result, 'error_message') else 'Unknown error'}"
+                )
 
     except Exception as e:
         return f"Error fetching job description: {str(e)}"
 
+
 async def read_job_description(url: str) -> str:
     result = await read_url(url)
     return result
+
 
 if __name__ == "__main__":
     # Test with different job sites
@@ -59,4 +70,4 @@ if __name__ == "__main__":
     for url in test_urls:
         result = asyncio.run(read_job_description(url))
         print(f"Job Description for {url}:\n{result}\n")
-        print("="*80)
+        print("=" * 80)

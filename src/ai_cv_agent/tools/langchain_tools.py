@@ -8,7 +8,6 @@ import asyncio
 from typing import Dict, Any, Optional
 from langchain.tools import tool
 from langchain.tools.base import ToolException
-from langchain_core.tools import StructuredTool
 
 
 # Import existing modules
@@ -22,10 +21,11 @@ from .pdf_exporter import html_to_pdf as _html_to_pdf
 # async def fetch_job_description(url: str) -> str:
 #     """
 #     Fetch job description from a URL.
-    
+
 #     Args:
 #         url: The URL of the job posting
-        
+
+
 #     Returns:
 #         Markdown-formatted job description content
 #     """
@@ -40,10 +40,10 @@ from .pdf_exporter import html_to_pdf as _html_to_pdf
 def fetch_job_description(url: str) -> str:
     """
     Fetch job description from a URL.
-    
+
     Args:
         url: The URL of the job posting
-        
+
     Returns:
         Markdown-formatted job description content
     """
@@ -58,14 +58,17 @@ def fetch_job_description(url: str) -> str:
             loop.close()
     except Exception as e:
         raise ToolException(f"Failed to fetch job description: {str(e)}")
-    
+
+
 # @tool(response_format="content_and_artifact")
 @tool
-def load_user_profile(profile_path: Optional[str] = "data/user_profile_resume_format.yaml") -> Dict[str, Any]:
-# def load_user_profile(profile_path: Optional[str] = "data/user_profile_resume_format.yaml") -> tuple[str, Dict[str, Any]]:
+def load_user_profile(
+    profile_path: Optional[str] = "data/user_profile_resume_format.yaml",
+) -> Dict[str, Any]:
+    # def load_user_profile(profile_path: Optional[str] = "data/user_profile_resume_format.yaml") -> tuple[str, Dict[str, Any]]:
     """
     Load user's professional profile from YAML file.
-    
+
     Args:
         profile_path: Optional Path to profile YAML (defaults to data/user_profile_resume_format.yaml)
 
@@ -79,14 +82,15 @@ def load_user_profile(profile_path: Optional[str] = "data/user_profile_resume_fo
     except Exception as e:
         raise ToolException(f"Failed to load user profile: {str(e)}")
 
+
 @tool(response_format="content_and_artifact")
 def parse_resume_yaml(yaml_content: str) -> tuple[str, ResumeData]:
     """
     Parse YAML content into ResumeData structure.
-    
+
     Args:
         yaml_content: YAML-formatted resume string
-        
+
     Returns:
         Tuple of (status message, ResumeData object as artifact)
     """
@@ -97,14 +101,15 @@ def parse_resume_yaml(yaml_content: str) -> tuple[str, ResumeData]:
     except Exception as e:
         raise ToolException(f"Failed to parse resume YAML: {str(e)}")
 
+
 @tool(response_format="content_and_artifact")
 def build_html_resume(resume_data: Optional[Dict[str, Any]] = None) -> tuple[str, str]:
     """
     Generate HTML from resume data.
-    
+
     Args:
         resume_data: Resume data dictionary or ResumeData object. If not provided, will use the last parsed resume data.
-        
+
     Returns:
         Tuple of (status message, HTML content as artifact)
     """
@@ -113,28 +118,31 @@ def build_html_resume(resume_data: Optional[Dict[str, Any]] = None) -> tuple[str
         if resume_data is None or (isinstance(resume_data, dict) and not resume_data):
             # Try to get the last parsed resume from global context
             # This is a workaround for the agent not passing the data correctly
-            raise ToolException("Resume data is required. Please provide the parsed resume data from the previous step.")
-        
+            raise ToolException(
+                "Resume data is required. Please provide the parsed resume data from the previous step."
+            )
+
         # Convert dict to ResumeData if needed
         if isinstance(resume_data, dict):
             resume_obj = convert_raw_resume_to_resume_data(resume_data)
         else:
             resume_obj = resume_data
-            
+
         html_content = _generate_cv_html(resume_obj)
         return "HTML resume generated successfully", html_content
     except Exception as e:
         raise ToolException(f"Failed to generate HTML: {str(e)}")
 
+
 @tool
 def convert_html_to_pdf(html_content: str, output_path: str) -> str:
     """
     Convert HTML content to PDF file.
-    
+
     Args:
         html_content: HTML content to convert
         output_path: Path where PDF should be saved (e.g., outputs/resume.pdf)
-        
+
     Returns:
         Success message with output path
     """
@@ -144,22 +152,20 @@ def convert_html_to_pdf(html_content: str, output_path: str) -> str:
     except Exception as e:
         raise ToolException(f"Failed to create PDF: {str(e)}")
 
+
 @tool
 def save_tailoring_report(
-    job_url: str, 
-    job_analysis: str,
-    changes_made: str,
-    output_path: str
+    job_url: str, job_analysis: str, changes_made: str, output_path: str
 ) -> str:
     """
     Save a detailed report of resume tailoring changes.
-    
+
     Args:
         job_url: URL of the job posting
         job_analysis: Analysis of job requirements
         changes_made: Description of changes made to resume
         output_path: Path to save the report (e.g., outputs/reports/tailoring_report.txt)
-        
+
     Returns:
         Success message with report path
     """
@@ -171,11 +177,12 @@ def save_tailoring_report(
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
 
-
-        mdFile = MdUtils(file_name=path.stem, title='Resume Tailoring Report')
+        mdFile = MdUtils(file_name=path.stem, title="Resume Tailoring Report")
 
         mdFile.new_paragraph(f"**Job URL:** {job_url}")
-        mdFile.new_paragraph(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        mdFile.new_paragraph(
+            f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        )
 
         mdFile.new_header(level=2, title="Job Analysis")
         mdFile.new_paragraph(job_analysis)
@@ -189,12 +196,13 @@ def save_tailoring_report(
     except Exception as e:
         raise ToolException(f"Failed to save report: {str(e)}")
 
+
 # Export all tools for easy import
 __all__ = [
-    'fetch_job_description',
-    'load_user_profile',
-    'parse_resume_yaml',
-    'build_html_resume',
-    'convert_html_to_pdf',
-    'save_tailoring_report'
+    "fetch_job_description",
+    "load_user_profile",
+    "parse_resume_yaml",
+    "build_html_resume",
+    "convert_html_to_pdf",
+    "save_tailoring_report",
 ]
