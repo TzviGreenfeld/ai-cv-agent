@@ -1,0 +1,259 @@
+# AI CV Agent - Cline Development Rules
+
+## Project Context
+You are working on an AI-powered CV/Resume tailoring system that uses LangChain and Azure OpenAI to intelligently adapt resumes to job descriptions. Always consult `memory_bank.md` for detailed project knowledge.
+
+## Core Development Guidelines
+
+### 1. Code Standards
+- **Python Version**: Use Python 3.x compatible code
+- **Package Manager**: Use UV for dependency management (`uv run` \ `uv add` commands)
+- **Import Style**: Always use absolute imports from `ai_cv_agent` package
+  ```python
+  from ai_cv_agent.tools.html_cv_builder import ResumeData
+  from ai_cv_agent.agent.langchain_cv_agent import LangChainCVAgent
+  ```
+- **Type Hints**: Use type hints for all function parameters and returns
+- **Docstrings**: Include comprehensive docstrings for all functions and classes
+
+### 2. AI Agent Development Best Practices
+
+#### Tool Development
+- **Return Format**: Tools with artifacts must return tuples: `(status_message, data)`
+- **Error Handling**: Always wrap exceptions in `ToolException`
+- **Async Operations**: Use proper event loop handling for async functions
+  ```python
+  loop = asyncio.new_event_loop()
+  asyncio.set_event_loop(loop)
+  try:
+      result = loop.run_until_complete(async_func())
+  finally:
+      loop.close()
+  ```
+
+#### Prompt Engineering
+- Keep prompts in `src/ai_cv_agent/agent/prompts.py`
+- Use clear formatting markers for structured outputs (e.g., `[RESUME_YAML]...[/RESUME_YAML]`)
+- Include specific instructions for ATS optimization
+- Provide JSON schemas for structured responses
+
+#### LangChain Integration
+- Use `@tool` decorator for all LangChain tools
+- Include `response_format="content_and_artifact"` for tools returning data
+- Document all tool parameters clearly
+- Handle artifact passing between tools explicitly
+
+### 3. File Organization
+- **Source Code**: All Python code in `src/ai_cv_agent/`
+- **Tests**: Test files in `tests/` with `test_` prefix
+- **Templates**: HTML templates in `templates/`, CSS in `templates/styles/`
+- **Data**: User profiles and examples in `data/`
+- **Outputs**: Generated files in `outputs/`, reports in `outputs/reports/`
+
+### 4. Testing Requirements
+- Create test files for new features in `tests/`
+- Use descriptive test names that explain the scenario
+- Test both success and failure cases
+- Include edge cases for AI responses
+- Run tests with: `uv run tests/test_file.py`
+
+### 5. Environment Setup
+- Always check for `.env` file with Azure OpenAI credentials
+- Required variables:
+  - `AZURE_AI_ENDPOINT`
+  - `AZURE_AI_API_KEY`
+  - `AZURE_AI_API_VERSION`
+  - `AZURE_OPENAI_DEPLOYMENT_NAME`
+- Use `python-dotenv` to load environment variables
+
+## Memory Bank Update Instructions
+
+### When to Update memory_bank.md
+
+**ALWAYS update the memory bank when:**
+1. **New Features Added**
+   - New tools or agent capabilities
+   - New templates or styles
+   - New workflow patterns
+
+2. **Architecture Changes**
+   - File structure modifications
+   - New dependencies added
+   - Integration points changed
+
+3. **Data Format Changes**
+   - YAML structure updates
+   - New resume fields
+   - API response format changes
+
+4. **Workflow Modifications**
+   - Tool execution order changes
+   - New or modified prompts
+   - Error handling improvements
+
+5. **Configuration Updates**
+   - New environment variables
+   - Build/deployment changes
+   - Testing setup modifications
+
+6. **Bug Fixes & Known Issues**
+   - Document fixed issues
+   - Add new known issues
+   - Update TODO items
+
+### How to Update memory_bank.md
+
+1. **Open the file**: `memory_bank.md`
+
+2. **Locate the relevant section**:
+   - Architecture → for structural changes
+   - Key Workflows → for process updates
+   - Data Formats → for schema changes
+   - Important Files → for new files or purposes
+   - Known Issues → for bugs and TODOs
+   - Common Patterns → for recurring code patterns
+
+3. **Make updates following these rules**:
+   - Be concise but comprehensive
+   - Include code examples for patterns
+   - Update file paths if structure changes
+   - Add dates to significant changes
+   - Keep formatting consistent
+
+4. **Update the timestamp**:
+   - Change "Last Updated" date at the bottom
+   - Add entry to "Recent Changes" if significant
+
+5. **Verify accuracy**:
+   - Cross-reference with actual code
+   - Ensure examples are working
+   - Check that paths are correct
+
+### Memory Bank Update Template
+
+When adding a new section or major update, use this template:
+```markdown
+## [Section Name]
+### [Subsection if needed]
+**Purpose**: Brief description
+**Implementation**: How it works
+**Usage**: When/how to use
+**Example**: 
+\```python
+# Code example if applicable
+\```
+**Notes**: Important considerations
+```
+
+## Specific Project Patterns
+
+### 1. Resume Tailoring Workflow
+Always follow this sequence:
+1. Fetch job description
+2. Load user profile
+3. Analyze job with AI
+4. Tailor resume content
+5. Generate HTML
+6. Convert to PDF
+7. Create analysis report
+
+### 2. Error Recovery
+- If job fetching fails, check URL validity
+- If YAML parsing fails, validate structure
+- If PDF generation fails, check HTML validity
+- Always provide meaningful error messages
+
+### 3. Output Management
+- Name outputs descriptively: `{company}_{position}_{date}.pdf`
+- Save reports with matching names
+- Create subdirectories for multiple applications
+- Clean up temporary files
+
+### 4. AI Response Handling
+- Always clean markdown code fences from AI responses
+- Parse JSON/YAML carefully with error handling
+- Validate AI-generated content structure
+- Handle incomplete or malformed responses gracefully
+
+## Code Quality Checklist
+
+Before committing changes:
+- [ ] Code follows Python PEP 8 style guide
+- [ ] All functions have type hints
+- [ ] Docstrings are complete and accurate
+- [ ] Error handling is comprehensive
+- [ ] Tests are written for new features
+- [ ] Memory bank is updated if needed
+- [ ] No hardcoded paths or credentials
+- [ ] Async operations properly handled
+- [ ] Tool artifacts correctly passed
+
+## Common Issues and Solutions
+
+### Issue: Tool not receiving data from previous step
+**Solution**: Ensure artifact (second element of tuple) is extracted and passed
+
+### Issue: AI hallucinating resume content
+**Solution**: Improve prompts with explicit instructions to use only provided data
+
+### Issue: PDF generation failing
+**Solution**: Validate HTML content and check for special characters
+
+### Issue: Async job fetching timeout
+**Solution**: Implement proper timeout handling and retry logic
+
+## Development Commands Reference
+
+```bash
+# Run the main agent
+uv run run_agent.py
+
+# Run specific test
+uv run tests/test_dynamic_styles.py
+
+# Install development dependencies
+uv pip install -e .
+
+# Run the agent module directly
+uv run -m ai_cv_agent.main
+
+# Generate test resume
+uv run python -c "from ai_cv_agent.agent.langchain_cv_agent import LangChainCVAgent; agent = LangChainCVAgent(); print(agent.run('test command'))"
+```
+
+## Git Commit Message Format
+
+Use conventional commits:
+- `feat:` New feature
+- `fix:` Bug fix
+- `docs:` Documentation updates
+- `refactor:` Code refactoring
+- `test:` Test additions/changes
+- `style:` Code style/formatting
+- `chore:` Maintenance tasks
+
+Example: `feat: add new modern CV template with ATS optimization`
+
+## Review Checklist for PRs
+
+- [ ] Code quality checklist completed
+- [ ] Tests pass successfully
+- [ ] Memory bank updated (if applicable)
+- [ ] Documentation updated
+- [ ] Environment variables documented
+- [ ] No sensitive data exposed
+- [ ] Follows project patterns
+
+## Additional Notes
+
+1. **Performance**: Consider caching job descriptions and user profiles for repeated use
+2. **Security**: Never commit `.env` files or API keys
+3. **Scalability**: Design tools to handle batch processing in the future
+4. **Monitoring**: Log important operations for debugging
+5. **User Experience**: Provide clear progress indicators for long operations
+
+---
+
+**Remember**: Always consult `memory_bank.md` first for project context, and update it when making significant changes. The memory bank is your source of truth for project knowledge.
+
+**Priority**: Maintain consistency with existing patterns while improving code quality and documentation.
