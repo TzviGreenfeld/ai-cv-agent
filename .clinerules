@@ -56,6 +56,10 @@ You are working on an AI-powered CV/Resume tailoring system that uses LangChain 
 - Test both success and failure cases
 - Include edge cases for AI responses
 - Run tests with: `uv run tests/test_file.py`
+- **Code Quality Checks**: Use `uv run ruff check` to verify code quality
+  - Run on individual files: `uv run ruff check path/to/file.py`
+  - Run on entire project: `uv run ruff check .`
+  - Fix auto-fixable issues: `uv run ruff check --fix`
 
 ### 5. Environment Setup
 - Always check for `.env` file with Azure OpenAI credentials

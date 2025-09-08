@@ -53,7 +53,7 @@ def test_standalone_job_analysis():
                 print(
                     f"  ATS Keywords: {', '.join(job_data.get('keywords_for_ats', []))}"
                 )
-        except:
+        except (json.JSONDecodeError, ValueError):
             # If not JSON, that's okay - it might be formatted text
             pass
 
@@ -135,7 +135,7 @@ def test_complete_workflow_with_explanations():
                 try:
                     job_data = json.load(f)
                     print(json.dumps(job_data, indent=2))
-                except:
+                except (json.JSONDecodeError, ValueError):
                     print(f.read()[:500])
 
     except Exception as e:
