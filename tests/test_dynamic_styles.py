@@ -1,9 +1,7 @@
-"""
-Test script to demonstrate dynamic style loading in Jinja2 templates
-"""
-
 import sys
 from pathlib import Path
+
+from click import style
 
 # Add src directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -72,84 +70,8 @@ def create_sample_resume_data():
     
     return resume
 
-def test_dynamic_styles():
-    """Test generating resumes with different styles"""
-    output_paths = []
-    # Create sample data
-    resume_data = create_sample_resume_data()
-    
-    print("=" * 60)
-    print("Testing Dynamic Style Loading for Jinja2 Templates")
-    print("=" * 60)
-    
-    # Test 1: Generate with default style (embedded CSS)
-    print("\n1. Generating resume with DEFAULT style (CSS embedded)...")
-    try:
-        html_default = generate_cv_html(
-            resume_data=resume_data,
-            style_name='default',
-            embed_css=True,
-            use_dynamic_template=True
-        )
-        output_path = Path("outputs/resume_default_embedded.html")
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(html_default, encoding='utf-8')
-        print(f"   ✓ Saved to: {output_path}")
-        output_paths.append(output_path)
-    except Exception as e:
-        print(f"   ✗ Error: {e}")
-    
-    # Test 2: Generate with modern style (embedded CSS)
-    print("\n2. Generating resume with MODERN style (CSS embedded)...")
-    try:
-        html_modern = generate_cv_html(
-            resume_data=resume_data,
-            style_name='modern',
-            embed_css=True,
-            use_dynamic_template=True
-        )
-        output_path = Path("outputs/resume_modern_embedded.html")
-        output_path.write_text(html_modern, encoding='utf-8')
-        print(f"   ✓ Saved to: {output_path}")
-        output_paths.append(output_path)
-    except Exception as e:
-        print(f"   ✗ Error: {e}")
-    
-    # Test 3: Generate with reversed style (embedded CSS)
-    print("\n3. Generating resume with REVERSED layout style (CSS embedded)...")
-    try:
-        html_reversed = generate_cv_html(
-            resume_data=resume_data,
-            style_name='reversed',
-            embed_css=True,
-            use_dynamic_template=True
-        )
-        output_path = Path("outputs/resume_reversed_embedded.html")
-        output_path.write_text(html_reversed, encoding='utf-8')
-        print(f"   ✓ Saved to: {output_path}")
-        print("   Note: Skills/Contact on left, Experience/Education on right")
-        output_paths.append(output_path)
-    except Exception as e:
-        print(f"   ✗ Error: {e}")
-    
-    # Test 4: Generate with classic style (embedded CSS)
-    print("\n4. Generating resume with CLASSIC style (CSS embedded)...")
-    try:
-        html_classic = generate_cv_html(
-            resume_data=resume_data,
-            style_name='classic',
-            embed_css=True,
-            use_dynamic_template=True
-        )
-        output_path = Path("outputs/resume_classic_embedded.html")
-        output_path.write_text(html_classic, encoding='utf-8')
-        print(f"   ✓ Saved to: {output_path}")
-        print("   Note: Traditional single-column layout with serif fonts")
-        output_paths.append(output_path)
-    except Exception as e:
-        print(f"   ✗ Error: {e}")
-    
-    # Test 5: Generate with external CSS link (not embedded)
+def test_external_styles(resume_data):
+    #  Generate with external CSS link (not embedded)
     print("\n5. Generating resume with external CSS link...")
     try:
         html_external = generate_cv_html(
@@ -162,10 +84,11 @@ def test_dynamic_styles():
         output_path.write_text(html_external, encoding='utf-8')
         print(f"   ✓ Saved to: {output_path}")
         print("   Note: This version requires CSS files to be served separately")
-        output_paths.append(output_path)
+        return output_path
     except Exception as e:
         print(f"   ✗ Error: {e}")
-    
+
+def test_backward_compatibility(resume_data):
     # Test 6: Compare with original template (backwards compatibility)
     print("\n6. Testing backwards compatibility with original template...")
     try:
@@ -176,26 +99,31 @@ def test_dynamic_styles():
         output_path = Path("outputs/resume_original_template.html")
         output_path.write_text(html_original, encoding='utf-8')
         print(f"   ✓ Saved to: {output_path}")
-        output_paths.append(output_path)
     except Exception as e:
         print(f"   ✗ Error: {e}")
     
-    print("\n" + "=" * 60)
-    print("Summary:")
-    print("- Dynamic style loading allows switching between themes")
-    print("- Available themes: default, modern, reversed, classic")
-    print("- CSS can be embedded (standalone HTML) or linked (requires CSS files)")
-    print("- Original template still works for backwards compatibility")
-    print("- Check the 'outputs' folder to see the generated HTML files")
-    print("=" * 60)
+    return output_path
 
-    for path in output_paths:
-        if path.exists():
-            print(f"   ✓ Found: {path}")
-        else:
-            print(f"   ✗ Not found: {path}")
-    return output_paths
+def get_styles():
+    path = Path("templates/styles")
+    # remove the "-styles" suffix
+    return [f.stem.replace("-styles", "") for f in path.glob("*.css")]
 
+def test_embed_css(css_name, resume_data):
+    """Test embedding CSS styles in the generated HTML"""
+    print(f"Testing CSS embedding for: {css_name}")
+    try:
+        html = generate_cv_html(
+            resume_data=resume_data,
+            style_name=css_name,
+            embed_css=True
+        )
+        output_path = Path(f"outputs/resume_{css_name}_embedded.html")
+        output_path.write_text(html, encoding='utf-8')
+        print(f"   ✓ Saved to: {output_path}")
+        return output_path
+    except Exception as e:
+        print(f"   ✗ Error: {e}")
 
 def make_pdfs(output_paths):
     """Convert generated HTML files to PDFs"""
@@ -213,5 +141,14 @@ def make_pdfs(output_paths):
             print(f"\n   ✗ HTML file not found, skipping PDF conversion: {html_path}")
 
 if __name__ == "__main__":
-    output_paths = test_dynamic_styles()
+    styles = get_styles()
+    resume_data = create_sample_resume_data()
+    output_paths = []
+    for style in styles:
+        output_path = test_embed_css(style, resume_data)
+        if output_path:
+            output_paths.append(output_path)
+    test_backward_compatibility(resume_data)
+    test_external_styles(resume_data)
+
     make_pdfs(output_paths)
