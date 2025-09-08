@@ -325,7 +325,7 @@ a {
 /* Page numbers (for print) */
 @page {
     margin: 15mm;
-    @bottom-center {
+    /* @bottom-center {
         content: counter(page);
-    }
+    } */
 }
