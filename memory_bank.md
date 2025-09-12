@@ -212,7 +212,8 @@ uv run tests/test_dynamic_styles.py
 - Added artifact support to tools
 - Implemented complete workflow tool
 - Enhanced prompt engineering for better tailoring
+- Added GitHub Actions CI: `.github/workflows/ci.yml` (ruff check & format) and `.github/workflows/auto-fix.yml` (scheduled/manual auto-fix & format)
 
 ---
-*Last Updated: January 2025*
+*Last Updated: September 2025*
 *Update Trigger: See .clinerules for update instructions*

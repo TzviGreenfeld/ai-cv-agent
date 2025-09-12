@@ -1,0 +1,39 @@
+name: Ruff Auto Fix
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1" # Every Monday at 03:00 UTC
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ruff-auto-fix:
+    name: Apply Ruff Auto Fixes
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ruff Lint (with fixes)
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: check --fix
+
+      - name: Ruff Format (apply formatting)
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: format
+
+      - name: Commit changes (if any)
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: ruff auto-fix"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          push_options: "--force-with-lease"
+          skip_fetch: true
