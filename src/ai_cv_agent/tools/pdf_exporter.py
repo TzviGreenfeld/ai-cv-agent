@@ -13,11 +13,11 @@ def html_to_pdf(html_content: str, output_path: str):
     """
 
     default_options = {
-            "format": "A4",
-            "margin": {"top": "0", "bottom": "0", "left": "0", "right": "0"},
-            "print_background": True,  # Important for CSS backgrounds/colors
-            "prefer_css_page_size": True,
-        }
+        "format": "A4",
+        "margin": {"top": "0", "bottom": "0", "left": "0", "right": "0"},
+        "print_background": True,  # Important for CSS backgrounds/colors
+        "prefer_css_page_size": True,
+    }
 
     try:
         with sync_playwright() as p:
