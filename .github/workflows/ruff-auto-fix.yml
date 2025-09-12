@@ -2,8 +2,6 @@ name: Ruff Auto Fix
 
 on:
   push:
-    branches:
-      - main
 
 permissions:
   contents: write
