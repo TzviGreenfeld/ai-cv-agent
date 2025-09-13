@@ -27,7 +27,12 @@ ai-cv-agent/
 │   ├── agent/                # Agent implementations
 │   │   ├── cv_agent.py       # Base agent (currently empty)
 │   │   ├── langchain_cv_agent.py  # Main LangChain agent
+│   │   ├── job_parser_agent.py    # NEW: Dedicated job parsing agent
+│   │   ├── job_parser_prompts.py  # NEW: Job parsing prompts
 │   │   └── prompts.py        # AI prompts and templates
+│   ├── models/               # NEW: Data models
+│   │   ├── __init__.py
+│   │   └── job_models.py     # Job-related Pydantic models
 │   └── tools/                # Tool modules
 │       ├── html_cv_builder.py     # HTML resume generation
 │       ├── job_reader.py          # Job description fetcher
@@ -41,7 +46,13 @@ ai-cv-agent/
 │   └── styles/               # CSS style variations
 ├── data/                     # User profiles and templates
 ├── outputs/                  # Generated resumes and reports
+├── examples/                 # NEW: Example scripts
+│   └── test_job_parser.py    # Job parser usage example
 └── tests/                    # Test files
+    ├── agent/                # NEW: Agent tests
+    │   └── test_job_parser_agent.py
+    └── tools/                # NEW: Tool tests
+        └── test_job_reader.py
 ```
 
 ## Key Workflows
@@ -64,6 +75,34 @@ ai-cv-agent/
 6. `convert_html_to_pdf(html, path)` → Saves PDF
 7. `create_detailed_tailoring_analysis(...)` → Returns report
 8. `save_tailoring_report(...)` → Saves report
+
+### 3. NEW: Multi-Agent Architecture (Job Parser Agent)
+**Purpose**: Separate job parsing into a dedicated agent for better modularity
+- **JobParserAgent**: Dedicated agent for parsing job descriptions
+  - `parse_from_url(url)` → Returns JobParseResult with structured job data
+  - `parse_from_text(text)` → Parses raw job text into structured format
+  - Uses structured Pydantic models (JobRequirements, JobParseResult)
+  - Handles both async and sync operations
+  - Better error handling and validation
+
+**Benefits of Multi-Agent Approach**:
+1. **Separation of Concerns**: Job parsing logic isolated from resume tailoring
+2. **Reusability**: Job parser can be used independently
+3. **Better Testing**: Each agent can be tested in isolation
+4. **Type Safety**: Pydantic models ensure data consistency
+5. **Scalability**: Easy to add more specialized agents
+
+**Integration Flow**:
+```python
+# 1. Parse job with JobParserAgent
+job_parser = JobParserAgent()
+job_result = await job_parser.parse_from_url(url)
+
+# 2. Use parsed job data with main CV agent
+if job_result.success:
+    job_data = job_result.job_requirements.to_analysis_dict()
+    # Pass to resume tailoring agent
+```
 
 ## Data Formats
 
@@ -105,6 +144,13 @@ education:
 - `langchain_cv_agent.py`: Main agent class with tool orchestration
 - `prompts.py`: Contains SYSTEM_PROMPT, TAILORING_PROMPT, JOB_ANALYSIS_PROMPT
 - `langchain_tools.py`: Tool wrappers with artifact support
+- `job_parser_agent.py`: NEW: Dedicated job parsing agent with structured output
+- `job_parser_prompts.py`: NEW: Prompts for job parsing (JOB_PARSING_PROMPT)
+
+### Model Files
+- `job_models.py`: Pydantic models for job data
+  - `JobRequirements`: Structured job posting representation
+  - `JobParseResult`: Result wrapper with success/error handling
 
 ### Tool Files
 - `job_reader.py`: Async web scraping for job descriptions
@@ -163,10 +209,39 @@ finally:
 ```
 
 ## Testing
-- Test files in `tests/` directory
-- `test_dynamic_styles.py`: Tests style variations
-- `test_agent_analysis.py`: Tests agent analysis capabilities
-- Run with: `uv run tests/test_file.py`
+
+### Test Structure
+```
+tests/
+├── agent/                           # Agent-specific tests
+│   ├── test_job_parser_agent.py    # Unit tests for JobParserAgent
+│   └── test_job_parser_integration.py  # Integration tests with real LLM
+├── tools/                           # Tool-specific tests
+│   └── test_job_reader.py          # Tests for job fetching
+├── mocks/                           # Mock data for testing
+│   ├── google_swe3_cloud.md        # Sample Google job posting
+│   └── README.md                    # Mock data documentation
+├── test_dynamic_styles.py          # Style variation tests
+└── test_agent_analysis.py          # Agent analysis tests
+```
+
+### Running Tests
+```bash
+# Run specific test file
+uv run tests/test_file.py
+
+# Run with pytest
+uv run pytest tests/agent/test_job_parser_agent.py -v
+
+# Run integration tests (requires Azure credentials)
+uv run pytest tests/agent/test_job_parser_integration.py -v
+```
+
+### Integration Testing Strategy
+- **Mock job fetching**: Use local files instead of real URLs
+- **Real LLM parsing**: Test actual AI parsing capabilities
+- **Specific URL mocking**: When testing with Google job URL, returns mock file content
+- **No external dependencies**: Tests work offline with mocked data
 
 ## Output Structure
 ```
@@ -214,7 +289,14 @@ uv run tests/test_dynamic_styles.py
 - Enhanced prompt engineering for better tailoring
 - Added GitHub Actions CI: `ruff-auto-fix.yml` (Ruff lint + format auto-fix)
 - Updated 2025-09-12: `ruff-auto-fix.yml` now runs on all branch pushes (removed branches filter; previously main-only)
+- Updated 2025-09-13: Implemented multi-agent architecture:
+  - Created `JobParserAgent` for dedicated job parsing
+  - Added Pydantic models for type-safe job data (`JobRequirements`, `JobParseResult`)
+  - Separated job parsing prompts into `job_parser_prompts.py`
+  - Added comprehensive tests for job parser and reader
+  - Created example scripts demonstrating new architecture
+  - Benefits: Better separation of concerns, reusability, testability
 
 ---
-*Last Updated: 2025-09-12*
+*Last Updated: 2025-09-13*
 *Update Trigger: See .clinerules for update instructions*
