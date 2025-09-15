@@ -1,5 +1,5 @@
 from playwright.sync_api import sync_playwright
-from playwright.async_api import async_playwright 
+from playwright.async_api import async_playwright
 from pathlib import Path
 
 DEFAULT_OPTIONS = {
@@ -8,6 +8,7 @@ DEFAULT_OPTIONS = {
     "print_background": True,  # Important for CSS backgrounds/colors
     "prefer_css_page_size": True,
 }
+
 
 def html_to_pdf(html_content: str, output_path: str):
     """
@@ -18,8 +19,6 @@ def html_to_pdf(html_content: str, output_path: str):
         output_path (str): Path where PDF should be saved
         options (dict): Optional PDF generation options
     """
-
-
 
     try:
         with sync_playwright() as p:

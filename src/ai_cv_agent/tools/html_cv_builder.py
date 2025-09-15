@@ -1,6 +1,5 @@
 import os
 from jinja2 import Environment, FileSystemLoader
-from typing import Dict, List, Any, Optional
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -10,6 +9,7 @@ load_dotenv()
 
 SAVE_ARTIFACTS = os.getenv("DEBUG", "false").lower() == "true"
 
+
 def get_html_template(template_name="base_template.html"):
     # Setup Jinja2 environment
     # Look for templates in the project root templates directory
@@ -17,6 +17,7 @@ def get_html_template(template_name="base_template.html"):
     env = Environment(loader=FileSystemLoader(template_dir))
     template = env.get_template(template_name)
     return template
+
 
 def load_css_content(style_name="default"):
     """Load CSS content from file for embedding in HTML"""
@@ -32,12 +33,14 @@ def load_css_content(style_name="default"):
     else:
         raise FileNotFoundError(f"Style file not found: {css_path}")
 
+
 def save_html_to_file(html_content: str, output_path: str = "templates/resume.html"):
     """Save HTML content to a file"""
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(html_content, encoding="utf-8")
     print(f"\nHTML generated successfully: {output_path}")
+
 
 def generate_cv_html(
     resume_data: ResumeData = None,
@@ -89,6 +92,7 @@ def generate_cv_html(
         save_html_to_file(html_content, output_name)
 
     return html_content
+
 
 if __name__ == "__main__":
     generate_cv_html()

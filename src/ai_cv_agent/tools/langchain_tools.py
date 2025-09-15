@@ -17,6 +17,7 @@ from .resume_parser import convert_raw_resume_to_resume_data
 from .html_cv_builder import ResumeData, generate_cv_html as _generate_cv_html
 from .pdf_exporter import html_to_pdf as _html_to_pdf
 
+
 @tool
 def fetch_job_description(url: str) -> str:
     """
