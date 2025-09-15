@@ -14,7 +14,10 @@ from langchain.tools.base import ToolException
 from ai_cv_agent.utils.job_fetcher import read_job_description as _read_job_description
 from ai_cv_agent.utils.profile_manager import read_user_profile as _read_user_profile
 from ai_cv_agent.utils.resume_mapper import convert_raw_resume_to_resume_data
-from ai_cv_agent.utils.html_builder import ResumeData, generate_cv_html as _generate_cv_html
+from ai_cv_agent.utils.html_builder import (
+    ResumeData,
+    generate_cv_html as _generate_cv_html,
+)
 from ai_cv_agent.utils.pdf_converter import html_to_pdf as _html_to_pdf
 
 

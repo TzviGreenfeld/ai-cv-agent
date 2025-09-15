@@ -8,7 +8,7 @@ from ai_cv_agent.utils.resume_mapper import convert_raw_resume_to_resume_data
 
 __all__ = [
     "generate_cv_html",
-    "ResumeData", 
+    "ResumeData",
     "read_job_description",
     "html_to_pdf",
     "html_to_pdf_async",
