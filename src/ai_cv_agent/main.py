@@ -9,7 +9,14 @@ from ai_cv_agent.utils.profile_manager import read_user_profile
 from ai_cv_agent.utils.resume_mapper import convert_raw_resume_to_resume_data
 from ai_cv_agent.utils.html_builder import generate_cv_html
 from ai_cv_agent.utils.pdf_converter import html_to_pdf_async
-from ai_cv_agent.utils.logging_setup import configure_logging, banner, step, success, fail
+from ai_cv_agent.utils.logging_setup import (
+    configure_logging,
+    banner,
+    step,
+    success,
+    fail,
+)
+
 
 async def run_complete_workflow(
     job_url: str, user_profile_path: str = "data/user_profile_resume_format.yaml"
@@ -21,7 +28,9 @@ async def run_complete_workflow(
     try:
         user_profile_dict = read_user_profile(user_profile_path)
         original_resume = convert_raw_resume_to_resume_data(user_profile_dict)
-        success(f"Loaded profile: {original_resume.candidate['name']}  (Title: {original_resume.candidate['title']})")
+        success(
+            f"Loaded profile: {original_resume.candidate['name']}  (Title: {original_resume.candidate['title']})"
+        )
     except Exception as e:
         fail(f"Failed to load user profile: {e}")
         return None
@@ -40,8 +49,12 @@ async def run_complete_workflow(
         success("Parsed job")
         logging.info(f"Company          : {job_result.job_requirements.company}")
         logging.info(f"Role             : {job_result.job_requirements.role}")
-        logging.info(f"Key requirements : {len(job_result.job_requirements.key_requirements)}")
-        logging.info(f"Technical skills : {len(job_result.job_requirements.technical_skills)}")
+        logging.info(
+            f"Key requirements : {len(job_result.job_requirements.key_requirements)}"
+        )
+        logging.info(
+            f"Technical skills : {len(job_result.job_requirements.technical_skills)}"
+        )
     except Exception as e:
         fail(f"Failed to parse job: {e}")
         return None
@@ -77,11 +90,17 @@ async def run_complete_workflow(
     # Step 5: PDF export
     step(5, "Exporting PDF")
     try:
-        company_clean = job_result.job_requirements.company.replace(" ", "_").replace("/", "_")
-        role_clean = job_result.job_requirements.role.replace(" ", "_").replace("/", "_")
+        company_clean = job_result.job_requirements.company.replace(" ", "_").replace(
+            "/", "_"
+        )
+        role_clean = job_result.job_requirements.role.replace(" ", "_").replace(
+            "/", "_"
+        )
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
 
-        output_dir = Path(__file__).parent.parent.parent / "outputs" / "tailored_resumes"
+        output_dir = (
+            Path(__file__).parent.parent.parent / "outputs" / "tailored_resumes"
+        )
         output_dir.mkdir(parents=True, exist_ok=True)
 
         pdf_path = output_dir / f"{company_clean}_{role_clean}_{timestamp}.pdf"
@@ -92,6 +111,7 @@ async def run_complete_workflow(
     except Exception as e:
         fail(f"Failed to save outputs: {e}")
         return None
+
 
 def main():
     configure_logging()
@@ -116,6 +136,7 @@ def main():
         logging.error(f"Unexpected error: {e}")
     finally:
         loop.close()
+
 
 if __name__ == "__main__":
     main()

@@ -8,10 +8,10 @@ DIM = "\x1b[2m"
 BOLD = "\x1b[1m"
 
 PALETTE = {
-    "INFO": "\x1b[38;5;39m",      # Cyan
+    "INFO": "\x1b[38;5;39m",  # Cyan
     "WARNING": "\x1b[38;5;214m",  # Orange
-    "ERROR": "\x1b[38;5;196m",    # Red
-    "DEBUG": "\x1b[38;5;244m",    # Grey
+    "ERROR": "\x1b[38;5;196m",  # Red
+    "DEBUG": "\x1b[38;5;244m",  # Grey
 }
 
 ICONS = {
@@ -21,12 +21,14 @@ ICONS = {
     "DEBUG": "·",
 }
 
+
 def _supports_color(stream) -> bool:
     if not hasattr(stream, "isatty") or not stream.isatty():
         return False
     if os.name == "nt":
         return True
     return True
+
 
 class CompactFormatter(logging.Formatter):
     def __init__(self, use_color: bool):
@@ -42,6 +44,7 @@ class CompactFormatter(logging.Formatter):
             colored = f"{icon} {level:<7}"
         record.level = colored
         return super().format(record)
+
 
 def configure_logging(verbosity: int = 0, httpx_level: Optional[int] = logging.WARNING):
     root = logging.getLogger()
@@ -68,18 +71,22 @@ def configure_logging(verbosity: int = 0, httpx_level: Optional[int] = logging.W
 
     root._cv_logging_configured = True
 
+
 def banner(text: str, char: str = "═", width: int = 60):
     line = char * width
     logging.info(line)
     logging.info(f"{text}")
     logging.info(line)
 
+
 def step(number: int, title: str):
     logging.info("")
     logging.info(f"{BOLD}[Step {number}] {title}{RESET}")
 
+
 def success(msg: str):
     logging.info(f"✓ {msg}")
+
 
 def fail(msg: str):
     logging.error(f"✗ {msg}")
