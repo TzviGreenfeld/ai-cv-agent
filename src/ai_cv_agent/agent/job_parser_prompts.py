@@ -1,9 +1,25 @@
 """Prompts for Job Parser Agent"""
 
-from .prompts import JOB_ANALYSIS_PROMPT
-
 # Re-export the job analysis prompt for use in job parser
-JOB_PARSER_PROMPT = JOB_ANALYSIS_PROMPT
+JOB_PARSER_PROMPT = """Analyze this job posting and provide a structured analysis:
+
+Job Description:
+{job_description}
+
+Provide your analysis in this exact JSON format:
+{{
+    "company": "Company Name",
+    "role": "Job Title",
+    "key_requirements": ["requirement1", "requirement2", ...],
+    "technical_skills": ["skill1", "skill2", ...],
+    "soft_skills": ["skill1", "skill2", ...],
+    "keywords_for_ats": ["keyword1", "keyword2", ...],
+    "main_responsibilities": ["resp1", "resp2", ...],
+    "nice_to_have": ["nice1", "nice2", ...]
+}}
+
+Return ONLY the JSON object, no additional text or formatting."""
+
 
 # Additional prompt for cleaning/extracting job text if needed
 JOB_TEXT_EXTRACTION_PROMPT = """Extract the main job description text from the following content. 

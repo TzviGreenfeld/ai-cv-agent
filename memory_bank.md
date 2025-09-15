@@ -55,7 +55,6 @@ ai-cv-agent/
     ├── agent/                # Agent tests
     │   └── test_job_parser_integration.py
     ├── test_complete_workflow.py  # NEW: Complete workflow test
-    └── test_workflow_with_mock.py # NEW: Mock workflow test
 ```
 
 ## Key Workflows
@@ -327,7 +326,7 @@ uv run tests/test_dynamic_styles.py
   - Created `ResumeTailoringAgent` for dedicated resume optimization
   - Moved `ResumeData` model to `models/resume_models.py`
   - Separated tailoring prompts into `resume_tailoring_prompts.py`
-  - Created complete workflow tests (`test_complete_workflow.py`, `test_workflow_with_mock.py`)
+  - Created complete workflow tests (`test_complete_workflow.py`)
   - Full pipeline: URL → JobParserAgent → ResumeTailoringAgent → HTML → PDF
   - Successfully tested end-to-end workflow with mock data
 

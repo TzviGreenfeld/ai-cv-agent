@@ -11,11 +11,14 @@ from langchain.tools.base import ToolException
 
 
 # Import existing modules
-from .job_reader import read_job_description as _read_job_description
-from .user_profile import read_user_profile as _read_user_profile
-from .resume_parser import convert_raw_resume_to_resume_data
-from .html_cv_builder import ResumeData, generate_cv_html as _generate_cv_html
-from .pdf_exporter import html_to_pdf as _html_to_pdf
+from ai_cv_agent.utils.job_fetcher import read_job_description as _read_job_description
+from ai_cv_agent.utils.profile_manager import read_user_profile as _read_user_profile
+from ai_cv_agent.utils.resume_mapper import convert_raw_resume_to_resume_data
+from ai_cv_agent.utils.html_builder import (
+    ResumeData,
+    generate_cv_html as _generate_cv_html,
+)
+from ai_cv_agent.utils.pdf_converter import html_to_pdf as _html_to_pdf
 
 
 @tool

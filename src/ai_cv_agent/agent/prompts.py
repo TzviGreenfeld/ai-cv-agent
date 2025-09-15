@@ -52,24 +52,6 @@ Return a complete YAML resume in the same format as the user profile, optimized 
 Focus on making it ATS-friendly by naturally incorporating relevant keywords."""
 
 # Job analysis prompt
-JOB_ANALYSIS_PROMPT = """Analyze this job posting and provide a structured analysis:
-
-Job Description:
-{job_description}
-
-Provide your analysis in this exact JSON format:
-{{
-    "company": "Company Name",
-    "role": "Job Title",
-    "key_requirements": ["requirement1", "requirement2", ...],
-    "technical_skills": ["skill1", "skill2", ...],
-    "soft_skills": ["skill1", "skill2", ...],
-    "keywords_for_ats": ["keyword1", "keyword2", ...],
-    "main_responsibilities": ["resp1", "resp2", ...],
-    "nice_to_have": ["nice1", "nice2", ...]
-}}
-
-Return ONLY the JSON object, no additional text or formatting."""
 
 # Detailed tailoring prompt
 DETAILED_TAILORING_PROMPT = """Based on this job analysis and user profile, create a tailored resume.

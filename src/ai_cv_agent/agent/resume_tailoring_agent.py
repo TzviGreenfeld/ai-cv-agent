@@ -9,7 +9,7 @@ from langchain_openai import AzureChatOpenAI
 
 from ..models.job_models import JobRequirements
 from ..models.resume_models import ResumeData
-from ..tools.resume_parser import convert_raw_resume_to_resume_data
+from ..utils.resume_mapper import convert_raw_resume_to_resume_data
 from .resume_tailoring_prompts import (
     RESUME_TAILORING_SYSTEM_PROMPT,
     RESUME_TAILORING_USER_PROMPT,
@@ -138,7 +138,7 @@ class ResumeTailoringAgent:
 if __name__ == "__main__":
     import asyncio
     from ..agent.job_parser_agent import JobParserAgent
-    from ..tools.user_profile import read_user_profile
+    from ..utils.profile_manager import read_user_profile
 
     async def test_tailoring():
         # Load original resume

@@ -10,7 +10,7 @@ from langchain_openai import AzureChatOpenAI
 from pydantic import ValidationError
 
 from ..models.job_models import JobRequirements, JobParseResult
-from ..tools.job_reader import read_job_description
+from ..utils.job_fetcher import read_job_description
 from .job_parser_prompts import JOB_PARSER_PROMPT, JOB_PARSER_SYSTEM_PROMPT
 
 # Load environment variables
