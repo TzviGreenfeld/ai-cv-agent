@@ -5,7 +5,7 @@ Converts YAML data to the existing ResumeData class structure.
 
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional
-from .html_cv_builder import ResumeData
+from ..models.resume_models import ResumeData
 
 
 class CandidateModel(BaseModel):
