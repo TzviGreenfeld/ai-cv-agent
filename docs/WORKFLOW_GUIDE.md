@@ -242,12 +242,7 @@ outputs/
 
 ## Testing
 
-### Test with Mock Data
 
-```bash
-# Test the complete workflow with mock job data
-uv run python tests/test_workflow_with_mock.py
-```
 
 ### Test with Real URL
 

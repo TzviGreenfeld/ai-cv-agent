@@ -20,10 +20,10 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from ai_cv_agent.agent.job_parser_agent import JobParserAgent
 from ai_cv_agent.agent.resume_tailoring_agent import ResumeTailoringAgent
-from ai_cv_agent.tools.user_profile import read_user_profile
-from ai_cv_agent.tools.resume_parser import convert_raw_resume_to_resume_data
-from ai_cv_agent.tools.html_cv_builder import generate_cv_html
-from ai_cv_agent.tools.pdf_exporter import html_to_pdf_async
+from ai_cv_agent.utils.profile_manager import read_user_profile
+from ai_cv_agent.utils.resume_mapper import convert_raw_resume_to_resume_data
+from ai_cv_agent.utils.html_builder import generate_cv_html
+from ai_cv_agent.utils.pdf_converter import html_to_pdf_async
 
 
 async def run_complete_workflow(
@@ -118,7 +118,8 @@ async def run_complete_workflow(
         )
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
 
-        output_dir = Path("outputs/tailored_resumes")
+        # output_dir = Path("outputs/tailored_resumes")
+        output_dir = Path(__file__).parent / "outputs" / "tailored_resumes"
         output_dir.mkdir(parents=True, exist_ok=True)
 
         pdf_path = output_dir / f"{company_clean}_{role_clean}_{timestamp}.pdf"
