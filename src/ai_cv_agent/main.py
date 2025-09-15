@@ -13,6 +13,7 @@ from ai_cv_agent.utils.pdf_converter import html_to_pdf_async
 
 logging.basicConfig(level=logging.INFO)
 
+
 async def run_complete_workflow(
     job_url: str, user_profile_path: str = "data/user_profile_resume_format.yaml"
 ):
@@ -106,7 +107,9 @@ async def run_complete_workflow(
         timestamp = datetime.now().strftime("%Y%m%d_%H%M")
 
         # output_dir = Path("outputs/tailored_resumes")
-        output_dir = Path(__file__).parent.parent.parent / "outputs" / "tailored_resumes"
+        output_dir = (
+            Path(__file__).parent.parent.parent / "outputs" / "tailored_resumes"
+        )
         output_dir.mkdir(parents=True, exist_ok=True)
 
         pdf_path = output_dir / f"{company_clean}_{role_clean}_{timestamp}.pdf"
@@ -161,8 +164,6 @@ def main():
         logging.info(f"\n\nUnexpected error: {e}")
     finally:
         loop.close()
-
-
 
 
 if __name__ == "__main__":
