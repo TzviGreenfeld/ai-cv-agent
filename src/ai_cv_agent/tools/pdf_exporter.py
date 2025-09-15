@@ -1,6 +1,13 @@
 from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright 
 from pathlib import Path
 
+DEFAULT_OPTIONS = {
+    "format": "A4",
+    "margin": {"top": "0", "bottom": "0", "left": "0", "right": "0"},
+    "print_background": True,  # Important for CSS backgrounds/colors
+    "prefer_css_page_size": True,
+}
 
 def html_to_pdf(html_content: str, output_path: str):
     """
@@ -12,12 +19,7 @@ def html_to_pdf(html_content: str, output_path: str):
         options (dict): Optional PDF generation options
     """
 
-    default_options = {
-        "format": "A4",
-        "margin": {"top": "0", "bottom": "0", "left": "0", "right": "0"},
-        "print_background": True,  # Important for CSS backgrounds/colors
-        "prefer_css_page_size": True,
-    }
+
 
     try:
         with sync_playwright() as p:
@@ -28,8 +30,23 @@ def html_to_pdf(html_content: str, output_path: str):
             # Wait for any images or fonts to load
             page.wait_for_load_state("networkidle")
 
-            page.pdf(path=output_path, **default_options)
+            page.pdf(path=output_path, **DEFAULT_OPTIONS)
             browser.close()
+    except Exception as e:
+        print(f"Error generating PDF: {e}")
+
+
+async def html_to_pdf_async(html_content: str, output_path: str):
+    """Async version of HTML to PDF conversion"""
+
+    try:
+        async with async_playwright() as p:
+            browser = await p.chromium.launch()
+            page = await browser.new_page()
+            await page.set_content(html_content)
+            await page.wait_for_load_state("networkidle")
+            await page.pdf(path=output_path, **DEFAULT_OPTIONS)
+            await browser.close()
     except Exception as e:
         print(f"Error generating PDF: {e}")
 

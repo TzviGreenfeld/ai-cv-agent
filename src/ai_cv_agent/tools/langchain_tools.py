@@ -17,25 +17,6 @@ from .resume_parser import convert_raw_resume_to_resume_data
 from .html_cv_builder import ResumeData, generate_cv_html as _generate_cv_html
 from .pdf_exporter import html_to_pdf as _html_to_pdf
 
-# @tool
-# async def fetch_job_description(url: str) -> str:
-#     """
-#     Fetch job description from a URL.
-
-#     Args:
-#         url: The URL of the job posting
-
-
-#     Returns:
-#         Markdown-formatted job description content
-#     """
-#     try:
-#         result = await _read_job_description(url)
-#         print(f"Fetched job description from {url}")
-#         print(result)  # Print first 500 characters for verification
-#         return result
-#     except Exception as e:
-#         raise ToolException(f"Failed to fetch job description: {str(e)}")
 @tool
 def fetch_job_description(url: str) -> str:
     """

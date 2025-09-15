@@ -27,12 +27,15 @@ ai-cv-agent/
 │   ├── agent/                # Agent implementations
 │   │   ├── cv_agent.py       # Base agent (currently empty)
 │   │   ├── langchain_cv_agent.py  # Main LangChain agent
-│   │   ├── job_parser_agent.py    # NEW: Dedicated job parsing agent
-│   │   ├── job_parser_prompts.py  # NEW: Job parsing prompts
+│   │   ├── job_parser_agent.py    # Dedicated job parsing agent
+│   │   ├── job_parser_prompts.py  # Job parsing prompts
+│   │   ├── resume_tailoring_agent.py  # NEW: Resume tailoring agent
+│   │   ├── resume_tailoring_prompts.py # NEW: Tailoring prompts
 │   │   └── prompts.py        # AI prompts and templates
-│   ├── models/               # NEW: Data models
+│   ├── models/               # Data models
 │   │   ├── __init__.py
-│   │   └── job_models.py     # Job-related Pydantic models
+│   │   ├── job_models.py     # Job-related Pydantic models
+│   │   └── resume_models.py  # NEW: Resume data model (moved from tools)
 │   └── tools/                # Tool modules
 │       ├── html_cv_builder.py     # HTML resume generation
 │       ├── job_reader.py          # Job description fetcher
@@ -46,13 +49,13 @@ ai-cv-agent/
 │   └── styles/               # CSS style variations
 ├── data/                     # User profiles and templates
 ├── outputs/                  # Generated resumes and reports
-├── examples/                 # NEW: Example scripts
+├── examples/                 # Example scripts
 │   └── test_job_parser.py    # Job parser usage example
 └── tests/                    # Test files
-    ├── agent/                # NEW: Agent tests
-    │   └── test_job_parser_agent.py
-    └── tools/                # NEW: Tool tests
-        └── test_job_reader.py
+    ├── agent/                # Agent tests
+    │   └── test_job_parser_integration.py
+    ├── test_complete_workflow.py  # NEW: Complete workflow test
+    └── test_workflow_with_mock.py # NEW: Mock workflow test
 ```
 
 ## Key Workflows
@@ -76,33 +79,59 @@ ai-cv-agent/
 7. `create_detailed_tailoring_analysis(...)` → Returns report
 8. `save_tailoring_report(...)` → Saves report
 
-### 3. NEW: Multi-Agent Architecture (Job Parser Agent)
-**Purpose**: Separate job parsing into a dedicated agent for better modularity
-- **JobParserAgent**: Dedicated agent for parsing job descriptions
-  - `parse_from_url(url)` → Returns JobParseResult with structured job data
-  - `parse_from_text(text)` → Parses raw job text into structured format
-  - Uses structured Pydantic models (JobRequirements, JobParseResult)
-  - Handles both async and sync operations
-  - Better error handling and validation
+### 3. Multi-Agent Architecture
 
-**Benefits of Multi-Agent Approach**:
-1. **Separation of Concerns**: Job parsing logic isolated from resume tailoring
-2. **Reusability**: Job parser can be used independently
-3. **Better Testing**: Each agent can be tested in isolation
-4. **Type Safety**: Pydantic models ensure data consistency
-5. **Scalability**: Easy to add more specialized agents
+**Complete Workflow with Specialized Agents**:
 
-**Integration Flow**:
+#### JobParserAgent
+- **Purpose**: Parse job descriptions into structured data
+- **Methods**: 
+  - `parse_from_url(url)` → Returns JobParseResult
+  - `parse_from_text(text)` → Parses raw text
+- **Output**: JobRequirements model with structured job data
+
+#### ResumeTailoringAgent (NEW)
+- **Purpose**: Tailor resumes based on job requirements
+- **Methods**:
+  - `tailor_resume(original_resume, job_requirements)` → Returns tailored ResumeData
+  - `tailor_resume_sync()` → Synchronous wrapper
+- **Features**:
+  - Uses structured JobRequirements input
+  - Returns ResumeData for direct HTML/PDF generation
+  - Separate prompts in `resume_tailoring_prompts.py`
+  - Low temperature (0.3) for consistent output
+
+#### Complete Workflow Integration
 ```python
-# 1. Parse job with JobParserAgent
-job_parser = JobParserAgent()
-job_result = await job_parser.parse_from_url(url)
+# 1. Load user profile
+user_profile_dict = read_user_profile("data/user_profile.yaml")
+original_resume = convert_raw_resume_to_resume_data(user_profile_dict)
 
-# 2. Use parsed job data with main CV agent
+# 2. Parse job
+job_parser = JobParserAgent()
+job_result = await job_parser.parse_from_url(job_url)
+
+# 3. Tailor resume
 if job_result.success:
-    job_data = job_result.job_requirements.to_analysis_dict()
-    # Pass to resume tailoring agent
+    tailoring_agent = ResumeTailoringAgent()
+    tailored_resume = await tailoring_agent.tailor_resume(
+        original_resume, 
+        job_result.job_requirements
+    )
+    
+# 4. Generate HTML
+html = generate_cv_html(tailored_resume, style_name="modern")
+
+# 5. Convert to PDF
+html_to_pdf(html, "outputs/tailored_resume.pdf")
 ```
+
+**Benefits**:
+1. **Modularity**: Each agent has a single responsibility
+2. **Type Safety**: Pydantic models throughout
+3. **Testability**: Each component tested independently  
+4. **Reusability**: Agents can be used in different workflows
+5. **Maintainability**: Clear separation of concerns
 
 ## Data Formats
 
@@ -144,13 +173,17 @@ education:
 - `langchain_cv_agent.py`: Main agent class with tool orchestration
 - `prompts.py`: Contains SYSTEM_PROMPT, TAILORING_PROMPT, JOB_ANALYSIS_PROMPT
 - `langchain_tools.py`: Tool wrappers with artifact support
-- `job_parser_agent.py`: NEW: Dedicated job parsing agent with structured output
-- `job_parser_prompts.py`: NEW: Prompts for job parsing (JOB_PARSING_PROMPT)
+- `job_parser_agent.py`: Dedicated job parsing agent with structured output
+- `job_parser_prompts.py`: Prompts for job parsing (JOB_PARSING_PROMPT)
+- `resume_tailoring_agent.py`: NEW: Resume tailoring agent with AI optimization
+- `resume_tailoring_prompts.py`: NEW: Tailoring-specific prompts
 
 ### Model Files
 - `job_models.py`: Pydantic models for job data
   - `JobRequirements`: Structured job posting representation
   - `JobParseResult`: Result wrapper with success/error handling
+- `resume_models.py`: Resume data model (moved from html_cv_builder)
+  - `ResumeData`: Core resume data structure with to_dict() method
 
 ### Tool Files
 - `job_reader.py`: Async web scraping for job descriptions
@@ -288,15 +321,16 @@ uv run tests/test_dynamic_styles.py
 - Implemented complete workflow tool
 - Enhanced prompt engineering for better tailoring
 - Added GitHub Actions CI: `ruff-auto-fix.yml` (Ruff lint + format auto-fix)
-- Updated 2025-09-12: `ruff-auto-fix.yml` now runs on all branch pushes (removed branches filter; previously main-only)
-- Updated 2025-09-13: Implemented multi-agent architecture:
-  - Created `JobParserAgent` for dedicated job parsing
-  - Added Pydantic models for type-safe job data (`JobRequirements`, `JobParseResult`)
-  - Separated job parsing prompts into `job_parser_prompts.py`
-  - Added comprehensive tests for job parser and reader
-  - Created example scripts demonstrating new architecture
-  - Benefits: Better separation of concerns, reusability, testability
+- Updated 2025-09-12: `ruff-auto-fix.yml` now runs on all branch pushes
+- Updated 2025-09-13: Implemented multi-agent architecture with JobParserAgent
+- Updated 2025-09-15: Complete workflow refactoring:
+  - Created `ResumeTailoringAgent` for dedicated resume optimization
+  - Moved `ResumeData` model to `models/resume_models.py`
+  - Separated tailoring prompts into `resume_tailoring_prompts.py`
+  - Created complete workflow tests (`test_complete_workflow.py`, `test_workflow_with_mock.py`)
+  - Full pipeline: URL → JobParserAgent → ResumeTailoringAgent → HTML → PDF
+  - Successfully tested end-to-end workflow with mock data
 
 ---
-*Last Updated: 2025-09-13*
+*Last Updated: 2025-09-15*
 *Update Trigger: See .clinerules for update instructions*
