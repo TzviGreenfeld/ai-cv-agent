@@ -1,5 +1,3 @@
-"""Job Parser Agent - Extracts structured data from job postings"""
-
 import os
 import json
 import asyncio
