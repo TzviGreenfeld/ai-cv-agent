@@ -14,11 +14,13 @@ AI-powered CV/Resume tailoring system that intelligently adapts resumes to speci
 
 ### Technology Stack
 - **Framework**: LangChain with Azure OpenAI
+- **Orchestration**: LangGraph for workflow management
 - **Language**: Python 3.x
 - **Package Manager**: UV (modern Python package manager)
 - **AI Model**: Azure OpenAI GPT deployment
 - **PDF Generation**: HTML to PDF conversion via pdf_exporter
 - **Web Scraping**: Async job description fetching
+- **Observability**: LangSmith for tracing
 
 ### Project Structure
 ```
@@ -29,14 +31,25 @@ ai-cv-agent/
 │   │   ├── langchain_cv_agent.py  # Main LangChain agent
 │   │   ├── job_parser_agent.py    # Dedicated job parsing agent
 │   │   ├── job_parser_prompts.py  # Job parsing prompts
-│   │   ├── resume_tailoring_agent.py  # NEW: Resume tailoring agent
-│   │   ├── resume_tailoring_prompts.py # NEW: Tailoring prompts
+│   │   ├── resume_tailoring_agent.py  # Resume tailoring agent
+│   │   ├── resume_tailoring_prompts.py # Tailoring prompts
 │   │   └── prompts.py        # AI prompts and templates
+│   ├── graph/                # LangGraph workflows (NEW)
+│   │   ├── __init__.py
+│   │   └── workflow_graph.py # Main LangGraph workflow implementation
 │   ├── models/               # Data models
 │   │   ├── __init__.py
 │   │   ├── job_models.py     # Job-related Pydantic models
-│   │   └── resume_models.py  # NEW: Resume data model (moved from tools)
-│   └── tools/                # Tool modules
+│   │   └── resume_models.py  # Resume data model
+│   ├── utils/                # Utility modules (NEW structure)
+│   │   ├── __init__.py
+│   │   ├── html_builder.py   # HTML resume generation
+│   │   ├── job_fetcher.py    # Job description fetcher
+│   │   ├── logging_setup.py  # Logging configuration
+│   │   ├── pdf_converter.py  # PDF conversion
+│   │   ├── profile_manager.py # Profile management
+│   │   └── resume_mapper.py  # YAML to ResumeData conversion
+│   └── tools/                # LangChain tool modules
 │       ├── html_cv_builder.py     # HTML resume generation
 │       ├── job_reader.py          # Job description fetcher
 │       ├── langchain_tools.py     # LangChain tool wrappers
@@ -54,12 +67,62 @@ ai-cv-agent/
 └── tests/                    # Test files
     ├── agent/                # Agent tests
     │   └── test_job_parser_integration.py
-    ├── test_complete_workflow.py  # NEW: Complete workflow test
+    ├── test_complete_workflow.py  # Complete workflow test
+    └── test_graph_workflow.py     # LangGraph workflow test (NEW)
 ```
 
 ## Key Workflows
 
-### 1. Complete Resume Tailoring Workflow
+### 1. LangGraph Workflow (NEW - Primary Method)
+**Orchestration**: State-based workflow using LangGraph
+
+#### Workflow State
+```python
+class WorkflowState(TypedDict):
+    job_url: str
+    user_profile_path: str
+    style_name: str
+    original_resume: Optional[ResumeData]
+    job_parse_result: Optional[JobParseResult]
+    job_requirements: Optional[JobRequirements]
+    tailored_resume: Optional[ResumeData]
+    html_content: Optional[str]
+    pdf_path: Optional[str]
+    error: Optional[str]
+```
+
+#### Graph Nodes
+1. **load_profile**: Load user profile YAML → ResumeData
+2. **parse_job**: Fetch and parse job URL → JobRequirements
+3. **tailor_resume**: AI-powered resume tailoring → ResumeData
+4. **generate_html**: Create styled HTML → HTML string
+5. **export_pdf**: Convert HTML to PDF → PDF path
+6. **error_sink**: Handle errors gracefully
+7. **success_sink**: Terminal success state
+
+#### Usage
+```python
+from ai_cv_agent.graph import run_workflow
+
+# Simple usage
+pdf_path = await run_workflow("https://job-url.com/posting")
+
+# With options
+pdf_path = await run_workflow(
+    job_url="https://job-url.com/posting",
+    user_profile_path="data/custom_profile.yaml",
+    style_name="modern"
+)
+```
+
+#### Benefits
+- **State Management**: Clear state tracking throughout workflow
+- **Error Handling**: Automatic error routing and recovery
+- **Observability**: Full LangSmith tracing support
+- **Modularity**: Each node is independently testable
+- **Conditional Routing**: Smart branching based on state
+
+### 2. Complete Resume Tailoring Workflow (Legacy)
 **Tool**: `create_tailored_resume_complete`
 1. Fetch job description from URL
 2. Load user profile YAML
@@ -67,16 +130,6 @@ ai-cv-agent/
 4. Generate HTML from tailored data
 5. Convert HTML to PDF
 6. Create and save analysis report
-
-### 2. Step-by-Step Workflow (Individual Tools)
-1. `fetch_job_description(url)` → Returns job text
-2. `load_user_profile(path)` → Returns profile dict
-3. `tailor_resume_with_llm(job_desc, profile)` → Returns tailored dict
-4. `analyze_job_with_llm(job_desc)` → Returns job analysis
-5. `build_html_resume(resume_data)` → Returns HTML content
-6. `convert_html_to_pdf(html, path)` → Saves PDF
-7. `create_detailed_tailoring_analysis(...)` → Returns report
-8. `save_tailoring_report(...)` → Saves report
 
 ### 3. Multi-Agent Architecture
 
@@ -293,12 +346,26 @@ Available CV styles in `templates/styles/`:
 
 ## Development Commands
 ```bash
-# Run main agent
+# Run with LangGraph workflow (NEW)
+python -m ai_cv_agent.main "https://job-url.com/posting"
+
+# Run with custom profile
+python -m ai_cv_agent.main "https://job-url.com/posting" --profile data/custom.yaml
+
+# Run with different style
+python -m ai_cv_agent.main "https://job-url.com/posting" --style modern
+
+# Run main agent (legacy)
 uv run run_agent.py
 
 # Run specific test
 uv run tests/test_dynamic_styles.py
 
+# Run LangGraph workflow tests
+uv run tests/test_graph_workflow.py
+
+# Check code quality
+uv run ruff check src/
 ```
 
 ## Critical Considerations
@@ -329,7 +396,16 @@ uv run tests/test_dynamic_styles.py
   - Created complete workflow tests (`test_complete_workflow.py`)
   - Full pipeline: URL → JobParserAgent → ResumeTailoringAgent → HTML → PDF
   - Successfully tested end-to-end workflow with mock data
+- Updated 2025-09-16: LangGraph workflow implementation:
+  - Created `graph/workflow_graph.py` with state-based orchestration
+  - Replaced imperative workflow in `main.py` with LangGraph runner
+  - Added CLI argument support for job URL, profile path, and style
+  - Removed manual logging in favor of LangSmith tracing
+  - Added comprehensive tests in `test_graph_workflow.py`
+  - Reorganized utils from tools directory for cleaner structure
+  - Added `langgraph` dependency to project
+  - Workflow now uses conditional routing for error handling
 
 ---
-*Last Updated: 2025-09-15*
+*Last Updated: 2025-09-16*
 *Update Trigger: See .clinerules for update instructions*
