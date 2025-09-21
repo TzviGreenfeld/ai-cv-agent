@@ -1,0 +1,36 @@
+graph TD
+    Start([Start]) --> load_profile[Load Profile]
+    
+    load_profile --> check_load{Error?}
+    check_load -->|Yes| error_sink[Error Sink]
+    check_load -->|No| parse_job[Parse Job]
+    
+    parse_job --> check_parse{Error?}
+    check_parse -->|Yes| error_sink
+    check_parse -->|No| tailor_resume[Tailor Resume]
+    
+    tailor_resume --> check_tailor{Error?}
+    check_tailor -->|Yes| error_sink
+    check_tailor -->|No| generate_html[Generate HTML]
+    
+    generate_html --> check_html{Error?}
+    check_html -->|Yes| error_sink
+    check_html -->|No| export_pdf[Export PDF]
+    
+    export_pdf --> check_pdf{Error?}
+    check_pdf -->|Yes| error_sink
+    check_pdf -->|No| success_sink[Success Sink]
+    
+    error_sink --> End([End])
+    success_sink --> End
+    
+    %% Styling
+    classDef processNode fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef errorNode fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef successNode fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    classDef decisionNode fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    
+    class load_profile,parse_job,tailor_resume,generate_html,export_pdf processNode
+    class error_sink errorNode
+    class success_sink successNode
+    class check_load,check_parse,check_tailor,check_html,check_pdf decisionNode

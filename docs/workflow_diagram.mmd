@@ -1,0 +1,20 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__(<p>__start__</p>)
+	load_profile(load_profile)
+	parse_job(parse_job)
+	tailor_resume(tailor_resume)
+	generate_html(generate_html)
+	export_pdf(export_pdf)
+	error_sink(error_sink)
+	success_sink(success_sink)
+	__end__(<p>__end__</p>)
+	__start__ --> load_profile;
+	load_profile --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc
