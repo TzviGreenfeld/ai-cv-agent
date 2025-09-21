@@ -31,7 +31,7 @@ async def main():
         #     style_name=style
         # )
 
-        print(f"\n✅ Success! Resume generated at:")
+        print("\n✅ Success! Resume generated at:")
         print(f"   {pdf_path}")
         print(f"\n📂 You can find it in: {Path(pdf_path).parent}")
 

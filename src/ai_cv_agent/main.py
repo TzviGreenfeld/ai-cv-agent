@@ -2,7 +2,6 @@
 
 import asyncio
 import argparse
-from pathlib import Path
 
 from ai_cv_agent.graph import run_workflow
 
@@ -14,7 +13,7 @@ async def main(
 ):
     """Run the CV tailoring workflow"""
     try:
-        print(f"🚀 Starting AI CV Agent workflow...")
+        print("🚀 Starting AI CV Agent workflow...")
         print(f"📋 Job URL: {job_url}")
         print(f"👤 Profile: {user_profile_path}")
         print(f"🎨 Style: {style_name}")
@@ -73,7 +72,7 @@ Examples:
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     try:
-        result = loop.run_until_complete(main(args.job_url, args.profile, args.style))
+        loop.run_until_complete(main(args.job_url, args.profile, args.style))
     except KeyboardInterrupt:
         print("\n\n⚠️  Interrupted by user")
     finally:

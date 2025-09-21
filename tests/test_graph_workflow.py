@@ -2,7 +2,7 @@
 
 import asyncio
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 from ai_cv_agent.graph.workflow_graph import run_workflow, build_workflow_graph
 from ai_cv_agent.models.job_models import JobRequirements, JobParseResult

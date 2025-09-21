@@ -1,6 +1,5 @@
 """Generate a visual representation of the LangGraph workflow"""
 
-from langgraph.graph import StateGraph
 from ai_cv_agent.graph.workflow_graph import build_workflow_graph
 
 
