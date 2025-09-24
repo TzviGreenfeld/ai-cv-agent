@@ -274,6 +274,51 @@ return "Status message", artifact_data
 ```
 
 ### Error Handling
+
+#### LangGraph Workflow Error Handling (NEW)
+The LangGraph workflow uses a decorator pattern for consistent error handling:
+
+```python
+def with_error_handling(node_name: str) -> Callable:
+    """Decorator to add consistent error handling to workflow nodes."""
+    def decorator(func: Callable) -> Callable:
+        @wraps(func)
+        async def wrapper(state: WorkflowState) -> dict:
+            # Check if there's already an error from a previous step
+            if state.get("error"):
+                logger.info(f"Skipping node {node_name} due to previous error")
+                return {}  # Return empty dict to not modify state
+            
+            try:
+                # Execute the node function
+                result = await func(state)
+                
+                # Check if the node itself returned an error
+                if result.get("error"):
+                    logger.error(f"Node {node_name} returned error")
+                    result["error_step"] = node_name
+                
+                return result
+                
+            except Exception as e:
+                # Log and return error state
+                logger.exception(f"Error in node {node_name}")
+                return {
+                    "error": f"Failed in {node_name}: {str(e)}",
+                    "error_step": node_name,
+                    "error_details": str(e),
+                }
+        return wrapper
+    return decorator
+```
+
+**Benefits**:
+- Linear workflow flow without conditional edges
+- Early exit when errors occur (subsequent nodes skip execution)
+- Consistent error logging and tracking
+- Clean separation of error handling from business logic
+
+#### Legacy Tool Error Handling
 All tools wrap exceptions in ToolException:
 ```python
 try:
@@ -405,7 +450,15 @@ uv run ruff check src/
   - Reorganized utils from tools directory for cleaner structure
   - Added `langgraph` dependency to project
   - Workflow now uses conditional routing for error handling
+- Updated 2025-09-24: Improved LangGraph error handling:
+  - Replaced conditional edges with linear flow and error decorator
+  - Removed error_sink and success_sink nodes
+  - Implemented `with_error_handling` decorator for consistent error management
+  - Added early exit pattern - nodes skip execution if previous error exists
+  - Simplified graph structure from 7 nodes to 5 nodes
+  - Enhanced error tracking with error_step and error_details in state
+  - Improved debugging with comprehensive logging
 
 ---
-*Last Updated: 2025-09-16*
+*Last Updated: 2025-09-24*
 *Update Trigger: See .clinerules for update instructions*

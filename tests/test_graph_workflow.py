@@ -134,7 +134,7 @@ async def test_workflow_profile_load_failure():
         with pytest.raises(RuntimeError) as exc_info:
             await run_workflow("https://test.com/job")
 
-        assert "Failed to load user profile" in str(exc_info.value)
+        assert "Failed in load_profile" in str(exc_info.value)
 
 
 def test_graph_structure():
@@ -150,8 +150,6 @@ def test_graph_structure():
         "tailor_resume",
         "generate_html",
         "export_pdf",
-        "error_sink",
-        "success_sink",
     }
 
     # Get the graph structure
@@ -160,6 +158,14 @@ def test_graph_structure():
 
     # Verify all expected nodes are present
     assert expected_nodes.issubset(nodes)
+    
+    # Verify linear flow structure
+    # The graph should have edges connecting nodes in sequence
+    edges = graph_def.edges
+    assert any(edge.source == "load_profile" and edge.target == "parse_job" for edge in edges)
+    assert any(edge.source == "parse_job" and edge.target == "tailor_resume" for edge in edges)
+    assert any(edge.source == "tailor_resume" and edge.target == "generate_html" for edge in edges)
+    assert any(edge.source == "generate_html" and edge.target == "export_pdf" for edge in edges)
 
 
 if __name__ == "__main__":
