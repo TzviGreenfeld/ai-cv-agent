@@ -47,47 +47,51 @@ class WorkflowState(TypedDict, total=False):
 
 def with_error_handling(node_name: str) -> Callable:
     """Decorator to add consistent error handling to workflow nodes.
-    
+
     Args:
         node_name: Name of the node for error tracking
-        
+
     Returns:
         Decorated function with error handling
     """
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(state: WorkflowState) -> dict:
             # Check if there's already an error from a previous step
             if state.get("error"):
-                logger.info(f"Skipping node {node_name} due to previous error: {state['error']}")
+                logger.info(
+                    f"Skipping node {node_name} due to previous error: {state['error']}"
+                )
                 return {}  # Return empty dict to not modify state
-            
+
             try:
                 # Log node execution
                 logger.info(f"Executing node: {node_name}")
-                
+
                 # Execute the node function
                 result = await func(state)
-                
+
                 # Check if the node itself returned an error
                 if result.get("error"):
                     logger.error(f"Node {node_name} returned error: {result['error']}")
                     result["error_step"] = node_name
-                
+
                 return result
-                
+
             except Exception as e:
                 # Log the error with full context
                 logger.exception(f"Error in node {node_name}")
-                
+
                 # Return error state
                 return {
                     "error": f"Failed in {node_name}: {str(e)}",
                     "error_step": node_name,
                     "error_details": str(e),
                 }
-        
+
         return wrapper
+
     return decorator
 
 
@@ -165,7 +169,7 @@ async def export_pdf(state: WorkflowState) -> dict:
 
 def build_workflow_graph() -> StateGraph:
     """Build the CV workflow graph with simplified linear flow.
-    
+
     Returns:
         Compiled StateGraph ready for execution
     """
@@ -198,22 +202,22 @@ async def run_workflow(
     style_name: str = "default",
 ) -> str:
     """Run the complete CV workflow using LangGraph.
-    
+
     This function orchestrates the entire resume tailoring process:
     1. Loads user profile
     2. Parses job description from URL
     3. Tailors resume to match job requirements
     4. Generates styled HTML
     5. Exports to PDF
-    
+
     Args:
         job_url: URL of the job posting
         user_profile_path: Path to user profile YAML
         style_name: CSS style name for HTML generation
-        
+
     Returns:
         Path to generated PDF
-        
+
     Raises:
         RuntimeError: If workflow fails at any step
     """
@@ -237,12 +241,12 @@ async def run_workflow(
         if final_state.get("error"):
             error_step = final_state.get("error_step", "unknown")
             error_details = final_state.get("error_details", "No details available")
-            
+
             logger.error(
                 f"Workflow failed at step '{error_step}': {final_state['error']}\n"
                 f"Details: {error_details}"
             )
-            
+
             raise RuntimeError(final_state["error"])
 
         # Ensure we have a PDF path

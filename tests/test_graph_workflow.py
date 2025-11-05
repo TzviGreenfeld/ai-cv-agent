@@ -158,14 +158,23 @@ def test_graph_structure():
 
     # Verify all expected nodes are present
     assert expected_nodes.issubset(nodes)
-    
+
     # Verify linear flow structure
     # The graph should have edges connecting nodes in sequence
     edges = graph_def.edges
-    assert any(edge.source == "load_profile" and edge.target == "parse_job" for edge in edges)
-    assert any(edge.source == "parse_job" and edge.target == "tailor_resume" for edge in edges)
-    assert any(edge.source == "tailor_resume" and edge.target == "generate_html" for edge in edges)
-    assert any(edge.source == "generate_html" and edge.target == "export_pdf" for edge in edges)
+    assert any(
+        edge.source == "load_profile" and edge.target == "parse_job" for edge in edges
+    )
+    assert any(
+        edge.source == "parse_job" and edge.target == "tailor_resume" for edge in edges
+    )
+    assert any(
+        edge.source == "tailor_resume" and edge.target == "generate_html"
+        for edge in edges
+    )
+    assert any(
+        edge.source == "generate_html" and edge.target == "export_pdf" for edge in edges
+    )
 
 
 if __name__ == "__main__":
